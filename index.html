@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026 NCS JGR Points Standings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --red:#C8102E; --gold:#F5C842;
+  --jgr:#E31837;
+  --bg:#090909; --bg2:#0f0f12; --bg3:#161619; --bg4:#1e1e24;
+  --line:rgba(255,255,255,0.06); --line2:rgba(255,255,255,0.12); --line3:rgba(255,255,255,0.2);
+  --text:#f2f2f4; --text2:#b4b4c4; --text3:#72728a;
+  --font-d:'Barlow Condensed',sans-serif; --font-b:'Barlow',sans-serif;
+  --hdr:48px; --sidebar:272px; --radius:6px;
+}
+html.light {
+  --bg:#f0f1f4; --bg2:#ffffff; --bg3:#e8eaef; --bg4:#dde0e8;
+  --line:rgba(0,0,0,0.07); --line2:rgba(0,0,0,0.13); --line3:rgba(0,0,0,0.25);
+  --text:#111118; --text2:#3a3a52; --text3:#7878a0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;overflow-x:hidden;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:15px;line-height:1.45;}
+
+/* ── TOP BAR ── */
+.top-bar{position:fixed;top:0;left:0;width:100%;z-index:200;height:var(--hdr);
+  background:rgba(9,9,9,0.97);border-bottom:2px solid var(--jgr);
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  backdrop-filter:blur(8px);}
+.tb-brand{display:flex;align-items:center;gap:12px;}
+.tb-logo{width:34px;height:34px;background:var(--jgr);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:900;font-size:12px;color:#fff;letter-spacing:0.5px;}
+.tb-title{font-family:var(--font-d);font-weight:900;font-size:20px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
+.tb-sub{font-size:10px;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;margin-top:1px;}
+.tb-divider{width:1px;height:22px;background:var(--line2);margin:0 8px;}
+.tb-pills{display:flex;align-items:center;gap:5px;}
+.pill{background:var(--bg4);border:1px solid var(--line2);border-radius:20px;padding:3px 11px;font-size:12px;color:var(--text2);}
+.pill b{color:var(--gold);font-weight:600;}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-nav{display:flex;align-items:center;gap:2px;background:var(--bg3);border:1px solid var(--line);border-radius:5px;padding:2px;}
+.nav-btn{font-family:var(--font-d);font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:4px 14px;border-radius:4px;border:none;background:none;color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.nav-btn.active{background:var(--jgr);color:#fff;}
+.nav-btn:hover:not(.active){background:var(--bg4);color:var(--text);}
+.theme-btn{width:32px;height:32px;border-radius:4px;border:1px solid var(--line2);background:var(--bg4);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s;flex-shrink:0;}
+.theme-btn:hover{border-color:var(--line3);color:var(--text);}
+
+/* ── SHELL ── */
+.shell{display:grid;grid-template-columns:var(--sidebar) 1fr;height:calc(100vh - var(--hdr));margin-top:var(--hdr);overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--bg2);border-right:1px solid var(--line2);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.sb-sec{padding:11px 14px;border-bottom:1px solid var(--line);}
+.sb-lbl{font-family:var(--font-d);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--text3);margin-bottom:9px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.stat-box{background:var(--bg4);border-radius:5px;padding:6px 9px;border:1px solid var(--line);}
+.stat-box-l{font-size:9px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:2px;}
+.stat-box-v{font-family:var(--font-d);font-weight:900;font-size:22px;line-height:1;}
+.stat-box-v.red{color:var(--red);}
+.stat-box-v.gold{color:var(--gold);}
+.stat-box-v.green{color:#2ecc71;}
+.stat-box-s{font-size:9px;color:var(--text3);margin-top:2px;}
+.prog-row{margin-bottom:9px;}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:4px;}
+.prog-label{font-size:12px;color:var(--text2);}
+.prog-val{font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--text);}
+.prog-track{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;}
+
+/* Chase list */
+.chase-list{list-style:none;}
+.chase-item{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);}
+.chase-item:last-child{border-bottom:none;}
+.ci-pos{font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--text3);}
+.ci-name{font-size:12px;color:var(--text);}
+.ci-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;flex-shrink:0;}
+.ci-pts{font-family:var(--font-d);font-weight:700;font-size:13px;}
+.chase-cutline-sep{font-size:10px;color:var(--red);text-align:center;letter-spacing:1px;text-transform:uppercase;padding:4px 0;border-top:1px dashed rgba(200,16,46,0.35);border-bottom:1px dashed rgba(200,16,46,0.35);margin:3px 0;background:rgba(200,16,46,0.05);}
+
+
+/* ── DRIVER CARDS ── */
+.driver-card{background:var(--bg3);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all 0.15s;}
+.driver-card:hover{border-color:var(--line3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.driver-card.active-card{border-color:var(--line3);}
+.driver-card.dimmed{opacity:0.2;transform:none !important;filter:saturate(0.15);}
+.dc-top{display:flex;align-items:flex-start;gap:12px;padding:14px 15px 10px;}
+.dc-num{font-family:var(--font-d);font-weight:900;font-size:56px;line-height:1;min-width:64px;text-align:center;}
+.dc-right{flex:1;}
+.dc-name{font-family:var(--font-d);font-weight:700;font-size:20px;line-height:1.1;color:var(--text);}
+.dc-car{font-size:11px;color:var(--text3);margin-top:3px;letter-spacing:0.3px;}
+.dc-badges{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+.badge{font-family:var(--font-d);font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:0.5px;text-transform:uppercase;}
+.b-out{background:var(--bg4);color:var(--text3);border:1px solid var(--line2);}
+.dc-pts-row{display:flex;align-items:baseline;gap:10px;padding:8px 15px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(0,0,0,0.15);}
+.dc-pts-big{font-family:var(--font-d);font-weight:900;font-size:32px;line-height:1;}
+.dc-pts-lbl{font-size:11px;color:var(--text3);}
+.dc-pts-gap{font-family:var(--font-d);font-size:14px;font-weight:700;margin-left:auto;}
+.dc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);}
+.dc-stat{background:var(--bg2);padding:7px 8px;text-align:center;}
+.dc-stat-l{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:2px;}
+.dc-stat-v{font-family:var(--font-d);font-weight:700;font-size:17px;line-height:1;}
+.dc-stat-v.gold{color:var(--gold);}
+.dc-stat-v.green{color:#2ecc71;}
+.dc-stat-v.red{color:var(--red);}
+
+/* ── MAIN CONTENT ── */
+.main-content{overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.main-content::-webkit-scrollbar{width:4px;}
+.main-content::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.page{display:none;padding:14px 18px 24px;}
+.page.active{display:flex;flex-direction:column;gap:12px;}
+
+/* ── PANEL ── */
+.panel{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--bg3);}
+.panel-title{font-family:var(--font-d);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text);}
+.panel-note{font-size:11px;color:var(--text3);}
+.panel-body{padding:12px;}
+
+/* ── CHARTS ── */
+
+.chart-wrap{position:relative;width:100%;}
+.legend{display:flex;gap:10px;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+
+/* Race history pills */
+
+/* ── METRICS TABLE ── */
+.mt{width:100%;border-collapse:collapse;font-size:13px;}
+.mt th{font-family:var(--font-d);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);padding:5px 10px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;position:sticky;top:0;background:var(--bg3);z-index:1;}
+.mt th:first-child{text-align:left;}
+.mt td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;color:var(--text2);white-space:nowrap;}
+.mt td:first-child{text-align:left;color:var(--text);font-weight:500;}
+.mt tr:last-child td{border-bottom:none;}
+.mt tr:hover td{background:var(--bg3);}
+.mt-d{display:flex;align-items:center;gap:8px;}
+.mt-sw{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.mv-r{color:var(--red);font-weight:600;}
+.mv-g{color:var(--gold);font-weight:600;}
+.mv-gr{color:#2ecc71;font-weight:600;}
+
+/* ── METRICS CARDS ── */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.mc{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+.mc-hdr{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;}
+.mc-sw{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.mc-name{font-family:var(--font-d);font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.5px;}
+.mc-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 14px;border-bottom:1px solid var(--line);}
+.mc-row:last-child{border-bottom:none;}
+.mc-key{font-size:12px;color:var(--text3);}
+.mc-val{font-family:var(--font-d);font-weight:700;font-size:14px;}
+.mc-val.red{color:var(--red);}
+.mc-val.gold{color:var(--gold);}
+.mc-val.green{color:#2ecc71;}
+
+/* ── EXPAND PANEL ── */
+.driver-expand{display:none;grid-column:1/-1;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;}
+.driver-expand.open{display:grid;grid-template-columns:200px 1fr 1fr;gap:0;}
+.de-stats{padding:12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:5px;overflow-y:auto;}
+.de-stat{background:var(--bg4);border-radius:4px;padding:5px 9px;border:1px solid var(--line);}
+.de-stat-l{font-size:9px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text3);margin-bottom:1px;}
+.de-stat-v{font-family:var(--font-d);font-weight:700;font-size:16px;line-height:1.1;color:var(--text);}
+.de-stat-s{font-size:10px;color:var(--text3);margin-top:1px;}
+.de-chart{padding:10px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:8px;}
+.de-chart-hdr{font-family:var(--font-d);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);}
+.de-log{padding:10px;overflow-y:auto;}
+.de-log-hdr{font-family:var(--font-d);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:6px;}
+.de-table{width:100%;border-collapse:collapse;font-size:11px;}
+.de-table th{font-family:var(--font-d);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text3);padding:3px 7px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;position:sticky;top:0;background:var(--bg2);}
+.de-table th:first-child,.de-table th:nth-child(2){text-align:left;}
+.de-table td{padding:4px 7px;border-bottom:1px solid var(--line);text-align:right;color:var(--text2);white-space:nowrap;}
+.de-table td:first-child{text-align:left;color:var(--text3);}
+.de-table td:nth-child(2){text-align:left;color:var(--text);}
+.de-table tr:last-child td{border-bottom:none;}
+.de-table tr:hover td{background:var(--bg3);}
+.de-metric-btn{font-family:var(--font-d);font-size:10px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;padding:2px 9px;border-radius:3px;border:1px solid var(--line2);background:var(--bg4);color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.de-metric-btn.active{border-color:currentColor;}
+.de-metric-btn:hover:not(.active){background:var(--bg3);color:var(--text2);}
+.de-close{position:absolute;top:8px;right:10px;font-size:16px;color:var(--text3);cursor:pointer;z-index:10;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:3px;background:var(--bg4);border:1px solid var(--line);}
+.de-close:hover{color:var(--text);border-color:var(--line2);}
+.de-wrap{position:relative;}
+
+.proj-btn{font-family:var(--font-d);font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px;border:1px solid var(--line2);background:var(--bg4);color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.proj-btn:hover{border-color:var(--line3);color:var(--text2);}
+
+.sec-hdr{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.sec-title{font-family:var(--font-d);font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1px;}
+.sec-note{font-size:11px;color:var(--text3);}
+.sec-marker{display:inline-block;background:rgba(227,24,55,0.1);border:1px solid rgba(227,24,55,0.3);color:var(--jgr);font-family:var(--font-d);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-left:8px;vertical-align:middle;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.metrics-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:800px){:root{--sidebar:0px;}.shell{grid-template-columns:1fr;}.sidebar{display:none;}.driver-expand.open{grid-template-columns:1fr;}.metrics-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:540px){:root{--hdr:40px;}.metrics-grid{grid-template-columns:1fr;}.dc-stats{grid-template-columns:repeat(2,1fr);}.tb-pills{display:none;}.tb-divider{display:none;}}
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="tb-brand">
+    <div class="tb-logo">JGR</div>
+    <div>
+      <div class="tb-title">2026 NCS JGR Points Standings</div>
+      <div class="tb-sub">Joe Gibbs Racing - Cup Series</div>
+    </div>
+  </div>
+  <div class="tb-divider"></div>
+  <div class="tb-pills">
+    <div class="pill">Race <b id="hdr-race">—</b> / 36</div>
+    <div class="pill">Last: <b id="hdr-last">—</b></div>
+    <div class="pill">Next: <b id="hdr-next">—</b></div>
+    <div class="pill">Series leader: <b id="hdr-leader">—</b></div>
+    <div class="pill">Chase cut P16: <b id="hdr-cutline">—</b></div>
+  </div>
+  <div class="tb-right">
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
+    <div class="tb-nav">
+      <button class="nav-btn active" onclick="showPage('dashboard',this)">Dashboard</button>
+      <button class="nav-btn" onclick="showPage('metrics',this)">Metrics</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sb-sec">
+      <div class="sb-lbl">Season Progress</div>
+      <div class="prog-row">
+        <div class="prog-top"><span class="prog-label">Regular Season</span><span class="prog-val" id="sb-reg-prog">—</span></div>
+        <div class="prog-track"><div class="prog-fill" id="sb-reg-fill" style="background:var(--jgr);"></div></div>
+      </div>
+      <div class="prog-row">
+        <div class="prog-top"><span class="prog-label">Full Season</span><span class="prog-val" id="sb-full-prog">—</span></div>
+        <div class="prog-track"><div class="prog-fill" id="sb-full-fill" style="background:var(--jgr);"></div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+        <span style="font-size:11px;color:var(--text3);">Races to cutoff: <b style="color:var(--text2);" id="sb-to-cutoff">—</b></span>
+        <span style="font-size:11px;color:var(--jgr);font-family:var(--font-d);font-weight:700;letter-spacing:0.5px;">R26 CUTOFF</span>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">Full Cup Standings · Top 20</div>
+      <ul class="chase-list" id="chase-list"></ul>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main-content">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+
+      <!-- 4 driver cards — fixed layout -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;" id="driver-cards-dash"></div>
+
+      <!-- Expand panel -->
+      <div class="de-wrap">
+        <div class="driver-expand" id="driver-expand">
+          <div class="de-stats" id="de-stats"></div>
+          <div class="de-chart" id="de-chart">
+            <div class="de-chart-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span id="de-chart-title">Cumulative Points</span>
+                <span id="de-ma-legend" style="display:none;align-items:center;gap:5px;font-size:10px;color:var(--text3);">
+                  <span style="display:inline-block;width:16px;height:0;border-top:2px dashed rgba(255,255,255,0.45);vertical-align:middle;"></span>3-race avg
+                </span>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;" id="de-metric-btns"></div>
+            </div>
+            <div style="flex:1;position:relative;min-height:180px;"><canvas id="de-canvas"></canvas></div>
+          </div>
+          <div class="de-log">
+            <div class="de-log-hdr">Race Log</div>
+            <table class="de-table">
+              <thead><tr><th>#</th><th>Track</th><th>Str</th><th>Fin</th><th>Pts</th><th>Stg</th><th>Bon</th><th>Led</th><th>Total</th><th>Rank</th></tr></thead>
+              <tbody id="de-tbody"></tbody>
+            </table>
+          </div>
+          <span class="de-close" onclick="closeExpand()">✕</span>
+        </div>
+      </div>
+
+      <!-- Cumulative Points — full width -->
+      <div class="panel">
+        <div class="panel-hdr">
+          <div class="panel-title">Cumulative Points</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button id="proj-toggle" class="proj-btn" onclick="toggleProjections()">Proj Off</button>
+            <div id="legend-points" class="legend"></div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="chart-wrap" style="height:300px;"><canvas id="chart-points" role="img" aria-label="Cumulative points for all 4 JGR drivers through R26 cutoff"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Chase Standings — full width -->
+      <div class="panel">
+        <div class="panel-hdr">
+          <div class="panel-title">Chase Standings - Top 24</div>
+          <div class="panel-note">JGR cars highlighted · gold line = P16 cutline</div>
+        </div>
+        <div class="panel-body">
+          <div class="chart-wrap" style="height:300px;"><canvas id="chart-standings" role="img" aria-label="Bar chart of top 20 standings with JGR cars highlighted"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Key metrics table -->
+      <div class="panel" style="flex-shrink:0;">
+        <div class="panel-hdr">
+          <div class="panel-title">Key Metrics Comparison</div>
+          <div class="panel-note" id="metrics-note">Through Race —</div>
+        </div>
+        <div class="panel-body" style="padding:0;">
+          <table class="mt">
+            <thead><tr>
+              <th>Driver</th><th>Points</th><th>Rank</th><th>vs Cutline</th>
+              <th>vs Leader</th><th>Avg Pts</th><th>Avg Start</th><th>Avg Finish</th>
+              <th>Poles</th><th>Wins</th><th>Stg Wins</th><th>Stg Pts</th>
+              <th>Top 5</th><th>Top 10</th><th>DNF</th><th>Laps Led</th>
+              <th>Proj R26</th><th>Proj R36</th>
+            </tr></thead>
+            <tbody id="metrics-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /dashboard -->
+
+    <!-- METRICS PAGE -->
+    <div class="page" id="page-metrics">
+      <div class="sec-hdr">
+        <div class="sec-title">Driver Season Metrics <span class="sec-marker" id="metrics-marker">Through Race —</span></div>
+        <div class="sec-note">Official NASCAR stats · projections at current avg pts/race pace</div>
+      </div>
+      <div class="metrics-grid" id="metrics-page-grid"></div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /shell -->
+
+<script>
+// ─────────────────────────────────────────
+// RACE SCHEDULE — 2026 NCS (36 races)
+// ─────────────────────────────────────────
+const RACES = [
+  {n:1,  short:'DAY',  track:'Daytona',       date:'Feb 15', name:'Daytona 500'},
+  {n:2,  short:'ATL',  track:'Atlanta',        date:'Feb 22', name:'Autotrader 400'},
+  {n:3,  short:'COTA', track:'COTA',           date:'Mar 1',  name:'Texas Grand Prix'},
+  {n:4,  short:'PHX',  track:'Phoenix',        date:'Mar 8',  name:'Straight Talk 500'},
+  {n:5,  short:'LVS',  track:'Las Vegas',      date:'Mar 15', name:'Pennzoil 400'},
+  {n:6,  short:'DAR',  track:'Darlington',     date:'Mar 22', name:'Goodyear 400'},
+  {n:7,  short:'MV',   track:'Martinsville',   date:'Mar 29', name:'Cook Out 400'},
+  {n:8,  short:'BRI',  track:'Bristol',        date:'Apr 12', name:'Food City 500'},
+  {n:9,  short:'KAN',  track:'Kansas',         date:'Apr 19', name:'AdventHealth 400'},
+  {n:10, short:'TAL',  track:'Talladega',      date:'Apr 27', name:'GEICO 500'},
+  {n:11, short:'DOV',  track:'Dover',          date:'May 4',  name:'Würth 400'},
+  {n:12, short:'DAR2', track:'Darlington 2',   date:'May 10', name:'Goodyear 400'},
+  {n:13, short:'CLT',  track:'Charlotte',      date:'May 25', name:'Coca-Cola 600'},
+  {n:14, short:'WGI',  track:'Watkins Glen',   date:'Jun 1',  name:'Go Bowling at WGI'},
+  {n:15, short:'NSH',  track:'Nashville',      date:'Jun 8',  name:'Whiskey 420'},
+  {n:16, short:'NWH',  track:'New Hampshire',  date:'Jun 22', name:'Ambetter 301'},
+  {n:17, short:'SND',  track:'San Diego',      date:'Jun 29', name:'Mission 200'},
+  {n:18, short:'CHI',  track:'Chicago',        date:'Jul 6',  name:'Grant Park 220'},
+  {n:19, short:'POC',  track:'Pocono',         date:'Jul 13', name:'HighPoint 400'},
+  {n:20, short:'IND',  track:'Indianapolis',   date:'Jul 27', name:'Brickyard 400'},
+  {n:21, short:'MCH',  track:'Michigan',       date:'Aug 10', name:'FireKeepers 400'},
+  {n:22, short:'ROC',  track:'Rockingham',     date:'Aug 17', name:'Food Lion 250'},
+  {n:23, short:'DAY2', track:'Daytona 2',      date:'Aug 23', name:'Coke Zero 400'},
+  {n:24, short:'ATL2', track:'Atlanta 2',      date:'Aug 31', name:'Quaker State 400'},
+  {n:25, short:'DAR3', track:'Darlington 3',   date:'Sep 6',  name:'Southern 500'},
+  {n:26, short:'CUT',  track:'Darlington 3',   date:'Sep 6',  name:'Southern 500 — CUTOFF'},
+  {n:27, short:'GAT',  track:'Gateway',        date:'Sep 13', name:'Chase R1'},
+  {n:28, short:'BRI2', track:'Bristol 2',      date:'Sep 19', name:'Chase R2'},
+  {n:29, short:'LVS2', track:'Las Vegas 2',    date:'Oct 5',  name:'Chase R3'},
+  {n:30, short:'TAL2', track:'Talladega 2',    date:'Oct 12', name:'Chase R4'},
+  {n:31, short:'CLT2', track:'Charlotte 2',    date:'Oct 19', name:'Chase R5'},
+  {n:32, short:'MV2',  track:'Martinsville 2', date:'Oct 26', name:'Chase R6'},
+  {n:33, short:'PHX2', track:'Phoenix 2',      date:'Nov 1',  name:'Chase R7'},
+  {n:34, short:'TEX',  track:'Texas',          date:'Nov 2',  name:'Chase R8'},
+  {n:35, short:'NWB',  track:'N. Wilkesboro',  date:'Nov 4',  name:'Chase R9'},
+  {n:36, short:'HOM',  track:'Homestead',      date:'Nov 8',  name:'Hard Rock 400 — FINALE'},
+];
+
+// ─────────────────────────────────────────
+// JGR DRIVER META — #11 #19 #20 #54
+// Official data R1–R8 from NASCAR PDFs
+// ─────────────────────────────────────────
+const DRIVER_META = [
+  {id:'hamlin', first:'Denny',       last:'Hamlin', car:'11', color:'#7B2FBE',
+   finish:[31,13,10,5,1,11,2,9],   starts:[22,29,19,11,2,9,1,11],
+   wins:1, stageWins:2,
+   stagePtsPerRace:[0,0,1,15,14,0,20,14],
+   lapsLed:[3,10,0,5,134,0,292,0], bonusPts:[0,0,0,0,1,0,0,0]},
+  {id:'briscoe', first:'Chase',      last:'Briscoe', car:'19', color:'#E87722',
+   finish:[36,2,null,null,8,12,14,5],  starts:[2,34,3,37,18,23,27,3],
+   wins:0, stageWins:0,
+   stagePtsPerRace:[0,8,0,0,0,7,0,13],
+   lapsLed:[23,27,8,0,0,0,4,0],   bonusPts:[0,0,0,0,0,0,0,0]},
+  {id:'bell',    first:'Christopher',last:'Bell',    car:'20', color:'#C8102E',
+   finish:[null,21,3,2,4,19,7,27],   starts:[12,32,8,12,1,22,11,14],
+   wins:0, stageWins:2,
+   stagePtsPerRace:[0,0,0,19,18,0,0,15],
+   lapsLed:[9,9,0,176,12,0,0,19], bonusPts:[0,0,0,0,0,0,0,0]},
+  {id:'tgibbs',  first:'Ty',         last:'Gibbs',   car:'54', color:'#1D9E3E',
+   finish:[23,null,4,4,5,6,4,1],     starts:[20,25,9,14,3,28,4,5],
+   wins:1, stageWins:1,
+   stagePtsPerRace:[0,0,15,3,7,2,16,6],
+   lapsLed:[0,0,5,12,0,0,1,25],   bonusPts:[0,0,0,0,0,0,0,0]},
+];
+
+// ─────────────────────────────────────────
+// DEFAULT DATA — through R8 Bristol
+// ─────────────────────────────────────────
+const DEFAULT_DATA = {
+  racesDone: 8,
+  lastRace: 'Bristol · Apr 12',
+  leaderName: 'Reddick',
+  leaderPts: 386,
+  updatedAt: 'Apr 12, 2026',
+  cutlineByRace: [39,45,45,47,76,139,167,177],
+  drivers: {
+    hamlin:  {pts:[8,32,60,107,177,203,259,300], rank:[33,27,23,12,4,4,3,3]},
+    briscoe: {pts:[2,45,46,47,76,108,131,176],   rank:[37,16,27,27,20,22,21,17]},
+    bell:    {pts:[9,25,59,113,164,182,212,231],  rank:[31,31,24,6,6,8,7,9]},
+    tgibbs:  {pts:[16,17,65,101,140,173,222,281], rank:[26,33,17,15,10,11,6,4]},
+  },
+  standings: [
+    {pos:1,  name:'Tyler Reddick',      car:'45', team:'23XI',     pts:386, jgr:false},
+    {pos:2,  name:'Ryan Blaney',        car:'12', team:'Penske',   pts:324, jgr:false},
+    {pos:3,  name:'Denny Hamlin',       car:'11', team:'JGR',      pts:300, jgr:true,  dId:'hamlin'},
+    {pos:4,  name:'Ty Gibbs',           car:'54', team:'JGR',      pts:281, jgr:true,  dId:'tgibbs'},
+    {pos:5,  name:'Chase Elliott',      car:'9',  team:'HMS',      pts:264, jgr:false},
+    {pos:6,  name:'Kyle Larson',        car:'5',  team:'HMS',      pts:260, jgr:false},
+    {pos:7,  name:'William Byron',      car:'24', team:'HMS',      pts:245, jgr:false},
+    {pos:8,  name:'Bubba Wallace',      car:'23', team:'23XI',     pts:236, jgr:false},
+    {pos:9,  name:'Christopher Bell',   car:'20', team:'JGR',      pts:231, jgr:true,  dId:'bell'},
+    {pos:10, name:'Chris Buescher',     car:'17', team:'RFK',      pts:230, jgr:false},
+    {pos:11, name:'Brad Keselowski',    car:'6',  team:'RFK',      pts:229, jgr:false},
+    {pos:12, name:'Joey Logano',        car:'22', team:'Penske',   pts:218, jgr:false},
+    {pos:13, name:'Carson Hocevar',     car:'77', team:'Spire',    pts:209, jgr:false},
+    {pos:14, name:'Ryan Preece',        car:'60', team:'HFT',      pts:209, jgr:false},
+    {pos:15, name:'Daniel Suarez',      car:'7',  team:'TCH',      pts:192, jgr:false},
+    {pos:16, name:'S. Van Gisbergen',   car:'97', team:'Spire',    pts:177, jgr:false},
+    {pos:17, name:'Chase Briscoe',      car:'19', team:'JGR',      pts:176, jgr:true,  dId:'briscoe'},
+    {pos:18, name:'Austin Cindric',     car:'2',  team:'Penske',   pts:172, jgr:false},
+    {pos:19, name:'M. McDowell',        car:'71', team:'FRM',      pts:171, jgr:false},
+    {pos:20, name:'AJ Allmendinger',    car:'16', team:'Kaulig',   pts:156, jgr:false},
+    {pos:21, name:'Ross Chastain',      car:'1',  team:'TCH',      pts:153, jgr:false},
+    {pos:22, name:'Zane Smith',         car:'38', team:'FRM',      pts:144, jgr:false},
+    {pos:23, name:'Erik Jones',         car:'43', team:'Legacy',   pts:133, jgr:false},
+    {pos:24, name:'Kyle Busch',         car:'8',  team:'RCR',      pts:131, jgr:false},
+  ],
+};
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let DATA = null, DRIVERS = [];
+let chartPts = null, chartStandings = null, expandChart = null;
+let expandedId = null, showProjections = false, isLight = false;
+
+// ─────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────
+function loadData() {
+  DATA = DEFAULT_DATA;
+  DRIVERS = DRIVER_META.map(meta => {
+    const d = (DATA.drivers || {})[meta.id] || {};
+    return {
+      ...meta,
+      pts:  [...(d.pts  || []), ...Array(36).fill(null)].slice(0,36),
+      rank: [...(d.rank || []), ...Array(36).fill(null)].slice(0,36),
+    };
+  });
+  renderAll();
+}
+
+// ─────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────
+const lPts   = d => { for(let i=DATA.racesDone-1;i>=0;i--) if(d.pts[i]!=null) return d.pts[i]; return 0; };
+const lRank  = d => { for(let i=DATA.racesDone-1;i>=0;i--) if(d.rank[i]!=null) return d.rank[i]; return null; };
+const gain   = (d,i) => { if(d.pts[i]==null) return null; let p=0; for(let j=i-1;j>=0;j--){if(d.pts[j]!=null){p=d.pts[j];break;}} return d.pts[i]-p; };
+const nRaced = d => d.pts.filter((p,i)=>i<DATA.racesDone&&p!=null).length;
+const avgP   = d => { const n=nRaced(d); return n?(lPts(d)/n).toFixed(1):'—'; };
+const avgF   = d => { const v=(d.finish||[]).filter(f=>f!=null); return v.length?(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1):'—'; };
+const avgS   = d => { const v=(d.starts||[]).filter(s=>s!=null); return v.length?(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1):'—'; };
+const poles  = d => (d.starts||[]).filter(s=>s===1).length;
+const top5   = d => (d.finish||[]).filter(f=>f!=null&&f<=5).length;
+const top10  = d => (d.finish||[]).filter(f=>f!=null&&f<=10).length;
+const dnf    = d => (d.finish||[]).filter((f,i)=>i<DATA.racesDone&&f==null&&(d.starts||[])[i]!=null).length;
+const lapsLedTotal  = d => (d.lapsLed||[]).reduce((a,b)=>a+(b||0),0);
+const stagePtsTotal = d => (d.stagePtsPerRace||[]).reduce((a,b)=>a+(b||0),0);
+const projP  = (d,t) => { const n=nRaced(d); if(!n) return '—'; return Math.round(lPts(d)+(lPts(d)/n)*(t-DATA.racesDone)); };
+const CUTLINE = () => DATA.cutlineByRace[DATA.racesDone-1]||0;
+
+// ─────────────────────────────────────────
+// RENDER ALL
+// ─────────────────────────────────────────
+function renderAll() {
+  updateHeaderPills();
+  updateSidebar();
+  buildDriverCards();
+  buildChaseList();
+  buildMetricsTable();
+  buildMetricsPage();
+  rebuildCharts();
+}
+
+function updateHeaderPills() {
+  const rd = DATA.racesDone;
+  document.getElementById('hdr-race').textContent = rd;
+  document.getElementById('hdr-last').textContent = rd>0&&RACES[rd-1]?RACES[rd-1].track:'—';
+  const next = RACES[rd]; document.getElementById('hdr-next').textContent = next?next.track:'—';
+  document.getElementById('hdr-leader').textContent = `${DATA.leaderName} ${DATA.leaderPts}`;
+  document.getElementById('hdr-cutline').textContent = `${CUTLINE()} pts`;
+  document.getElementById('metrics-note').textContent = `Through Race ${rd} · projections at current pace`;
+  document.getElementById('metrics-marker').textContent = `Through Race ${rd}`;
+}
+
+function updateSidebar() {
+  const rd = DATA.racesDone;
+  document.getElementById('sb-reg-prog').textContent = `${rd} / 26`;
+  document.getElementById('sb-full-prog').textContent = `${rd} / 36`;
+  document.getElementById('sb-reg-fill').style.width = `${Math.min((rd/26)*100,100)}%`;
+  document.getElementById('sb-full-fill').style.width = `${(rd/36)*100}%`;
+  document.getElementById('sb-to-cutoff').textContent = Math.max(0,26-rd);
+
+}
+
+// ─────────────────────────────────────────
+// DRIVER CARDS
+// ─────────────────────────────────────────
+function buildDriverCards() {
+  const cut = CUTLINE();
+  const sorted = [...DRIVERS].sort((a,b)=>['11','19','20','54'].indexOf(a.car)-['11','19','20','54'].indexOf(b.car));
+  document.getElementById('driver-cards-dash').innerHTML = sorted.map(d=>{
+    const pts=lPts(d), rank=lRank(d);
+    const isIn=rank&&rank<=16, isCut=rank===16;
+    const diff=pts-cut;
+    let badges = '';
+    if(isCut)  badges+=`<span class="badge" style="background:${d.color}22;color:${d.color};border:1px solid ${d.color}55;">On Cutline</span>`;
+    else if(isIn) badges+=`<span class="badge" style="background:${d.color}22;color:${d.color};border:1px solid ${d.color}55;">In Chase</span>`;
+    else          badges+=`<span class="badge b-out">Outside Chase</span>`;
+    if(d.wins)    badges+=`<span class="badge" style="background:${d.color};color:#fff;">${d.wins} Win${d.wins>1?'s':''}</span>`;
+    const dc=isCut?'gold':(diff>=0?'green':'red');
+    const dt=isCut?'On cutline':(diff>0?`+${diff}`:`${diff}`);
+    return `<div class="driver-card" data-id="${d.id}" onclick="expandDriver('${d.id}')" style="border-top:4px solid ${d.color};">
+      <div class="dc-top">
+        <div class="dc-num" style="color:${d.color}bb;">#${d.car}</div>
+        <div class="dc-right">
+          <div class="dc-name">${d.first} ${d.last}</div>
+          <div class="dc-car">JGR Toyota Camry XSE</div>
+          <div class="dc-badges">${badges}</div>
+        </div>
+      </div>
+      <div class="dc-pts-row" style="border-top-color:${d.color}33;">
+        <span class="dc-pts-big" style="color:${d.color};">${pts||'—'}</span>
+        <span class="dc-pts-lbl">pts · P${rank||'—'}</span>
+        <span class="dc-pts-gap dc-stat-v ${dc}">${pts?dt:'—'}</span>
+      </div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dc-stat-l">Wins</div><div class="dc-stat-v ${d.wins?'gold':''}">${d.wins||0}</div></div>
+        <div class="dc-stat"><div class="dc-stat-l">Stg W</div><div class="dc-stat-v ${d.stageWins?'gold':''}">${d.stageWins||0}</div></div>
+        <div class="dc-stat"><div class="dc-stat-l">Top 5</div><div class="dc-stat-v ${top5(d)?'green':''}">${top5(d)}</div></div>
+        <div class="dc-stat"><div class="dc-stat-l">Laps Led</div><div class="dc-stat-v">${lapsLedTotal(d)||0}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────
+// EXPAND PANEL
+// ─────────────────────────────────────────
+function expandDriver(id) {
+  const d = DRIVERS.find(x=>x.id===id);
+  if(!d) return;
+  if(expandedId===id) { closeExpand(); return; }
+  expandedId = id;
+
+  document.querySelectorAll('.driver-card').forEach(c=>{
+    c.classList.toggle('dimmed', c.dataset.id!==id);
+    c.classList.toggle('active-card', c.dataset.id===id);
+  });
+
+  const cut=CUTLINE(), rd=DATA.racesDone;
+  const pts=lPts(d), rank=lRank(d), diff=pts-cut;
+  const p26=projP(d,26), p36=projP(d,36);
+
+  const statRow=(label,value,color='',sub='')=>
+    `<div class="de-stat"><div class="de-stat-l">${label}</div><div class="de-stat-v"${color?` style="color:${color};"`:''}}>${value}</div>${sub?`<div class="de-stat-s">${sub}</div>`:''}</div>`;
+
+  document.getElementById('de-stats').innerHTML = `
+    <div style="font-family:var(--font-d);font-weight:900;font-size:18px;color:${d.color};letter-spacing:1px;margin-bottom:4px;">#${d.car} · ${d.first} ${d.last}</div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">JGR Toyota Camry XSE</div>
+    ${statRow('Points', pts||'—', d.color, `P${rank||'—'} · ${nRaced(d)} starts`)}
+    ${statRow('vs Cutline', pts?(diff>0?'+':'')+diff:'—', diff>=0?'#2ecc71':'var(--red)', `Cutline: ${cut} pts`)}
+    ${statRow('Avg Pts / Race', avgP(d), 'var(--gold)')}
+    ${statRow('Avg Start · Finish', `${avgS(d)} · ${avgF(d)}`)}
+    ${statRow('Wins · Poles', `${d.wins||0} · ${poles(d)}`, d.wins?'var(--gold)':'')}
+    ${statRow('Stage Wins · Pts', `${d.stageWins||0} · ${stagePtsTotal(d)}`)}
+    ${statRow('Top 5 · Top 10', `${top5(d)} · ${top10(d)}`)}
+    ${statRow('Laps Led', lapsLedTotal(d)||0)}
+    ${statRow('Proj R26 · R36', `${p26} · ${p36}`, typeof p26==='number'&&p26>=cut?'#2ecc71':'var(--red)')}
+  `;
+
+  const rows = RACES.slice(0,rd).map((r,i)=>{
+    const fin=(d.finish||[])[i], str=(d.starts||[])[i];
+    const cumPts=d.pts[i], rnk=d.rank[i];
+    const stgPts=(d.stagePtsPerRace||[])[i]??null;
+    const ledLaps=(d.lapsLed||[])[i]??0;
+    const bonPts=(d.bonusPts||[])[i]??0;
+    const g=gain(d,i);
+    if(str==null&&fin==null&&cumPts==null) return `<tr><td>R${r.n}</td><td style="color:var(--text3);">${r.short}</td><td colspan="8" style="color:var(--text3);text-align:center;font-size:10px;">DNS</td></tr>`;
+    const isWin=fin===1;
+    return `<tr>
+      <td style="color:var(--text3);">R${r.n}</td><td title="${r.name}">${r.short}</td>
+      <td>${str!=null?str:'—'}</td>
+      <td style="color:${isWin?'var(--gold)':'var(--text)'};">${fin!=null?fin:'—'}${isWin?' ★':''}</td>
+      <td style="color:${d.color};">${g!=null?'+'+g:'—'}</td>
+      <td style="color:${stgPts>0?'var(--gold)':'var(--text3)'};">${stgPts!=null?stgPts:'—'}</td>
+      <td style="color:${bonPts>0?'#2ecc71':'var(--text3)'};">${bonPts||'—'}</td>
+      <td style="color:${ledLaps>0?d.color:'var(--text3)'};">${ledLaps||'—'}</td>
+      <td>${cumPts!=null?cumPts:'—'}</td>
+      <td style="color:${rnk&&rnk<=16?'var(--red)':'var(--text3)'};">${rnk?'P'+rnk:'—'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('de-tbody').innerHTML = rows;
+
+  const panel = document.getElementById('driver-expand');
+  panel.classList.add('open');
+  panel.style.borderColor = d.color+'44';
+
+  const metrics=[
+    {key:'pts',label:'Cum. Points'},{key:'start',label:'Start Pos'},
+    {key:'finish',label:'Finish Pos'},{key:'ptsGained',label:'Pts/Race'},
+    {key:'stagePts',label:'Stage Pts'},{key:'lapsLed',label:'Laps Led'},{key:'rank',label:'Chase Rank'},
+  ];
+  document.getElementById('de-metric-btns').innerHTML = metrics.map(m=>
+    `<button class="de-metric-btn${m.key==='pts'?' active':''}" style="${m.key==='pts'?`color:${d.color};`:''}" onclick="setExpandMetric('${m.key}')">${m.label}</button>`
+  ).join('');
+  buildExpandChart('pts');
+}
+
+function setExpandMetric(key) {
+  document.querySelectorAll('.de-metric-btn').forEach(b=>{
+    const isA=b.onclick.toString().includes(`'${key}'`);
+    b.classList.toggle('active',isA);
+    const d=DRIVERS.find(x=>x.id===expandedId);
+    b.style.color=isA&&d?d.color:'';
+  });
+  buildExpandChart(key);
+}
+
+function buildExpandChart(key) {
+  const d=DRIVERS.find(x=>x.id===expandedId);
+  if(!d) return;
+  if(expandChart){expandChart.destroy();expandChart=null;}
+  const rd=DATA.racesDone;
+  const gc=isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.05)',tc=isLight?'#9090a8':'#707080';
+  const tt={backgroundColor:isLight?'#fff':'#18181e',borderColor:isLight?'rgba(0,0,0,0.15)':'rgba(255,255,255,0.1)',borderWidth:1,titleColor:isLight?'#111118':'#f0f0f0',bodyColor:isLight?'#3a3a52':'#8a8a9a',padding:8};
+  const cutoff=26;
+  const cfg={
+    pts:{label:'Cumulative Points',type:'line',reversed:false,cutline:true,data:RACES.slice(0,cutoff).map((_,i)=>d.pts[i]??null)},
+    finish:{label:'Finish Position',type:'line',reversed:true,data:RACES.slice(0,rd).map((_,i)=>(d.finish||[])[i]??null)},
+    start:{label:'Start Position',type:'line',reversed:true,data:RACES.slice(0,rd).map((_,i)=>(d.starts||[])[i]??null)},
+    ptsGained:{label:'Points per Race',type:'line',reversed:false,data:RACES.slice(0,rd).map((_,i)=>gain(d,i))},
+    stagePts:{label:'Stage Points',type:'bar',reversed:false,data:RACES.slice(0,rd).map((_,i)=>(d.stagePtsPerRace||[])[i]??null)},
+    lapsLed:{label:'Laps Led',type:'bar',reversed:false,data:RACES.slice(0,rd).map((_,i)=>(d.lapsLed||[])[i]??null)},
+    rank:{label:'Chase Rank',type:'line',reversed:true,data:RACES.slice(0,rd).map((_,i)=>d.rank[i]??null)},
+  }[key];
+  document.getElementById('de-chart-title').textContent=cfg.label;
+  const maLeg=document.getElementById('de-ma-legend');
+  if(maLeg)maLeg.style.display=key!=='pts'?'inline-flex':'none';
+  const useCut=key==='pts';
+  const labels=useCut?RACES.slice(0,cutoff).map(r=>r.short):RACES.slice(0,rd).map(r=>r.short);
+  const isLine=cfg.type==='line';
+  const datasets=[{
+    label:cfg.label,data:cfg.data,
+    borderColor:d.color,backgroundColor:isLine?d.color+'18':d.color+'bb',
+    borderWidth:isLine?2.5:0,borderRadius:isLine?0:3,pointRadius:isLine?4:0,pointHoverRadius:6,
+    tension:isLine?0.35:0,fill:false,spanGaps:false,
+  }];
+  if(key!=='pts'){
+    const w=3;
+    const ma=cfg.data.map((_,i)=>{const sl=cfg.data.slice(Math.max(0,i-w+1),i+1).filter(v=>v!=null);return sl.length>=2?Math.round((sl.reduce((a,b)=>a+b,0)/sl.length)*10)/10:null;});
+    datasets.push({label:'3-race avg',data:ma,borderColor:'rgba(255,255,255,0.45)',borderDash:[4,3],borderWidth:1.5,pointRadius:0,tension:0.4,fill:false,spanGaps:true,type:'line'});
+  }
+  if(cfg.cutline){datasets.push({label:'Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5C842',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:false,type:'line'});}
+  const yOpts={grid:{color:gc},ticks:{color:tc,font:{size:10}}};
+  if(cfg.reversed){const vals=cfg.data.filter(v=>v!=null);const mx=vals.length?Math.max(...vals):40;yOpts.min=1;yOpts.max=mx+2;}
+  expandChart=new Chart(document.getElementById('de-canvas').getContext('2d'),{
+    type:cfg.type,data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt}},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}},y:yOpts}}
+  });
+}
+
+function closeExpand() {
+  expandedId=null;
+  document.getElementById('driver-expand').classList.remove('open');
+  document.querySelectorAll('.driver-card').forEach(c=>c.classList.remove('dimmed','active-card'));
+  if(expandChart){expandChart.destroy();expandChart=null;}
+}
+
+// ─────────────────────────────────────────
+// CHASE LIST SIDEBAR
+// ─────────────────────────────────────────
+function buildChaseList() {
+  const standings=DATA.standings||[];
+  const p16pts=standings[15]?.pts||0;
+  let html='';
+  standings.forEach((s,i)=>{
+    if(i===16) html+=`<div class="chase-cutline-sep">── Chase Cutline ──</div>`;
+    const d=s.jgr?DRIVERS.find(dr=>dr.id===s.dId):null;
+    const color=d?d.color:'var(--text3)';
+    const diff=s.pts-p16pts;
+    const dTxt=i<16?(i===15?'cut':`+${diff}`):diff+'';
+    const dClr=i<16?'var(--text3)':(i===15?'var(--gold)':'var(--red)');
+    html+=`<li class="chase-item">
+      <span class="ci-pos">${s.pos}</span>
+      <span class="ci-name"><span class="ci-dot" style="background:${color};"></span>${s.name.split(' ').slice(-1)[0]}${s.jgr?` <span style="color:${color};font-size:9px;font-family:var(--font-d);font-weight:700;">JGR</span>`:''}</span>
+      <span class="ci-pts" style="color:${s.jgr?color:''}">${s.pts} <span style="font-size:10px;color:${dClr};">${dTxt}</span></span>
+    </li>`;
+  });
+  document.getElementById('chase-list').innerHTML = html;
+}
+
+// ─────────────────────────────────────────
+// METRICS TABLE
+// ─────────────────────────────────────────
+function buildMetricsTable() {
+  const cut=CUTLINE(), ldr=DATA.leaderPts;
+  const sorted=[...DRIVERS].sort((a,b)=>['11','19','20','54'].indexOf(a.car)-['11','19','20','54'].indexOf(b.car));
+  document.getElementById('metrics-tbody').innerHTML = sorted.map(d=>{
+    const pts=lPts(d),rank=lRank(d),diff=pts-cut;
+    const p26=projP(d,26),p36=projP(d,36),isC=rank&&rank<=16;
+    return `<tr>
+      <td><div class="mt-d"><div class="mt-sw" style="background:${d.color};"></div>#${d.car} ${d.last}</div></td>
+      <td>${pts||'—'}</td>
+      <td class="${isC?'mv-r':''}">${rank?`P${rank}`:'—'}</td>
+      <td class="${diff>=0?'mv-gr':'mv-r'}">${pts?(diff>0?'+':'')+diff:'—'}</td>
+      <td class="mv-r">${pts?pts-ldr:'—'}</td>
+      <td>${avgP(d)}</td><td>${avgS(d)}</td><td>${avgF(d)}</td>
+      <td class="mv-g">${poles(d)||0}</td>
+      <td class="mv-g">${d.wins||0}</td>
+      <td class="mv-g">${d.stageWins||0}</td>
+      <td>${stagePtsTotal(d)}</td>
+      <td class="${top5(d)>0?'mv-g':''}">${top5(d)}</td>
+      <td class="${top10(d)>0?'mv-g':''}">${top10(d)}</td>
+      <td class="${dnf(d)>0?'mv-r':''}">${dnf(d)}</td>
+      <td class="${lapsLedTotal(d)>0?'mv-g':''}">${lapsLedTotal(d)}</td>
+      <td class="${typeof p26==='number'&&p26>=cut?'mv-gr':'mv-r'}">${p26}</td>
+      <td>${p36}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────
+// METRICS PAGE
+// ─────────────────────────────────────────
+function buildMetricsPage() {
+  const cut=CUTLINE(),ldr=DATA.leaderPts,rd=DATA.racesDone;
+  const sorted=[...DRIVERS].sort((a,b)=>['11','19','20','54'].indexOf(a.car)-['11','19','20','54'].indexOf(b.car));
+  document.getElementById('metrics-page-grid').innerHTML = sorted.map(d=>{
+    const pts=lPts(d),rank=lRank(d),diff=pts-cut;
+    const p26=projP(d,26),p36=projP(d,36),isC=rank&&rank<=16;
+    const rows=[
+      {k:'Current Points',     v:pts||'—',              c:''},
+      {k:'Chase Rank',         v:rank?`P${rank}`:'—',   c:isC?'green':'red'},
+      {k:'Races Run',          v:`${nRaced(d)} of ${rd}`,c:''},
+      {k:'Avg Pts / Race',     v:avgP(d),               c:''},
+      {k:'Average Start',      v:avgS(d),               c:''},
+      {k:'Average Finish',     v:avgF(d),               c:''},
+      {k:'Best Finish',        v:(()=>{const v=(d.finish||[]).filter(f=>f!=null);return v.length?Math.min(...v):'—';})(), c:''},
+      {k:'Poles',              v:poles(d),              c:poles(d)?'gold':''},
+      {k:'Race Wins',          v:d.wins||0,             c:d.wins?'gold':''},
+      {k:'Stage Wins',         v:d.stageWins||0,        c:d.stageWins?'gold':''},
+      {k:'Stage Points',       v:stagePtsTotal(d),       c:stagePtsTotal(d)>0?'gold':''},
+      {k:'Top 5 Finishes',     v:top5(d),               c:top5(d)>0?'gold':''},
+      {k:'Top 10 Finishes',    v:top10(d),              c:top10(d)>0?'gold':''},
+      {k:'Laps Led',           v:lapsLedTotal(d),       c:lapsLedTotal(d)>0?'gold':''},
+      {k:'DNFs',               v:dnf(d),                c:dnf(d)>0?'red':''},
+      {k:'vs Cutline',         v:pts?(diff>0?'+':'')+diff:'—',c:diff>=0?'green':'red'},
+      {k:'vs Series Leader',   v:pts?pts-ldr:'—',       c:'red'},
+      {k:'Projected at R26',   v:p26,                   c:typeof p26==='number'&&p26>=cut?'green':'red'},
+      {k:'Projected at R36',   v:p36,                   c:''},
+      {k:'Pts/race to make cut',v:pts&&nRaced(d)?((cut+(cut/DATA.racesDone)*(26-DATA.racesDone)-pts)/(26-DATA.racesDone)).toFixed(1):'—',c:''},
+    ];
+    return `<div class="mc">
+      <div class="mc-hdr">
+        <div class="mc-sw" style="background:${d.color};"></div>
+        <div><div class="mc-name">#${d.car} ${d.last}</div><div style="font-size:10px;color:var(--text3);">Joe Gibbs Racing</div></div>
+      </div>
+      ${rows.map(r=>`<div class="mc-row"><span class="mc-key">${r.k}</span><span class="mc-val ${r.c}">${r.v}</span></div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────
+// CHARTS
+// ─────────────────────────────────────────
+function toggleProjections() {
+  showProjections = !showProjections;
+  const btn=document.getElementById('proj-toggle');
+  if(btn){btn.textContent=showProjections?'Proj On':'Proj Off';btn.style.background=showProjections?'rgba(212,160,23,0.15)':'';btn.style.borderColor=showProjections?'#F5C842':'';btn.style.color=showProjections?'#F5C842':'';}
+  rebuildCharts();
+}
+
+function rebuildCharts() {
+  if(chartPts){chartPts.destroy();chartPts=null;}
+  if(chartStandings){chartStandings.destroy();chartStandings=null;}
+
+  const rd=DATA.racesDone;
+  const tt={backgroundColor:isLight?'#fff':'#18181e',borderColor:isLight?'rgba(0,0,0,0.15)':'rgba(255,255,255,0.1)',borderWidth:1,titleColor:isLight?'#111118':'#f0f0f0',bodyColor:isLight?'#3a3a52':'#8a8a9a',padding:8};
+  const gc=isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.05)',tc=isLight?'#9090a8':'#707080';
+
+  // Legend
+  const legendHtml=DRIVERS.map(d=>`<div class="leg-item"><div class="leg-dot" style="background:${d.color};"></div>#${d.car} ${d.last}</div>`).join('')+
+    `<div class="leg-item"><div style="width:14px;height:2px;border-top:2px dashed #F5C842;margin-top:3px;"></div>P16 cut</div>`;
+  document.getElementById('legend-points').innerHTML=legendHtml;
+
+  const cutoff=26;
+  const ptLabels=RACES.slice(0,cutoff).map(r=>r.short);
+
+  // Vertical "Now" line plugin
+  if(!Chart.registry.plugins.get('jgrNowLine')){
+    Chart.register({id:'jgrNowLine',afterDraw(chart){
+      if(chart.canvas.id!=='chart-points')return;
+      if(rd<1||rd>=cutoff)return;
+      const{ctx,scales:{x,y}}=chart;
+      const px=x.getPixelForValue(rd-1);
+      ctx.save();ctx.beginPath();ctx.moveTo(px,y.top);ctx.lineTo(px,y.bottom);
+      ctx.lineWidth=1.5;ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='11px "Barlow Condensed",sans-serif';ctx.textAlign='center';ctx.fillText('Now',px,y.top-4);ctx.restore();
+    }});
+  }
+
+  chartPts=new Chart(document.getElementById('chart-points').getContext('2d'),{
+    type:'line',
+    data:{labels:ptLabels,datasets:[
+      ...DRIVERS.map(d=>({
+        label:`#${d.car} ${d.last}`,data:d.pts.slice(0,cutoff).map(v=>v??null),
+        borderColor:d.color,backgroundColor:d.color+'15',borderWidth:2.5,pointRadius:4,pointHoverRadius:6,tension:0.35,fill:false,spanGaps:false,
+      })),
+      ...DRIVERS.map(d=>{
+        const lastPts=lPts(d),n=nRaced(d);
+        if(!n||!lastPts)return{label:`#${d.car} proj`,data:Array(cutoff).fill(null),hidden:true,borderColor:d.color};
+        const rate=lastPts/n;
+        const lastIdx=(()=>{for(let j=rd-1;j>=0;j--)if(d.pts[j]!=null)return j;return -1;})();
+        const arr=Array(cutoff).fill(null);
+        if(lastIdx>=0)for(let j=lastIdx;j<cutoff;j++)arr[j]=Math.round(lastPts+rate*(j-lastIdx));
+        return{label:`#${d.car} proj`,data:arr,borderColor:d.color,borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0,fill:false,spanGaps:false,hidden:!showProjections};
+      }),
+      {label:'P16 Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5C842',borderDash:[8,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#F5C842',fill:false,spanGaps:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tt},
+      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9},autoSkip:false,maxRotation:45,minRotation:45}},
+              y:{min:0,grid:{color:gc},ticks:{color:tc,font:{size:11}},title:{display:true,text:'Cumulative Points',color:tc,font:{size:11}}}}}
+  });
+
+  // Standings bar chart — top 20, JGR highlighted
+  const standings=DATA.standings||[];
+  const p16pts=standings[15]?.pts||0;
+  const barColors=standings.map(s=>{
+    if(!s.jgr) return 'rgba(255,255,255,0.1)';
+    const d=DRIVERS.find(dr=>dr.id===s.dId);
+    return d?d.color:'var(--jgr)';
+  });
+  const barBorders=standings.map(s=>{
+    if(!s.jgr) return 'rgba(255,255,255,0.15)';
+    const d=DRIVERS.find(dr=>dr.id===s.dId);
+    return d?d.color:'var(--jgr)';
+  });
+
+  chartStandings=new Chart(document.getElementById('chart-standings').getContext('2d'),{
+    type:'bar',
+    data:{labels:standings.map(s=>`P${s.pos}`),datasets:[
+      {label:'Points',data:standings.map(s=>s.pts),backgroundColor:barColors,borderColor:barBorders,borderWidth:1,borderRadius:3},
+      {label:'P16 Cutline',data:Array(standings.length).fill(p16pts),type:'line',borderColor:'#F5C842',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{
+      title:ctx=>`P${standings[ctx[0].dataIndex].pos} — ${standings[ctx[0].dataIndex].name}`,
+      label:ctx=>ctx.dataset.label==='P16 Cutline'?`Cutline: ${p16pts} pts`:`${ctx.parsed.y} pts`,
+    }}},scales:{
+      x:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:tc,font:{size:11}}},
+      y:{grid:{color:gc},ticks:{color:tc,font:{size:11}},title:{display:true,text:'Points',color:tc,font:{size:11}}},
+    }}
+  });
+}
+
+// ─────────────────────────────────────────
+// NAV + THEME
+// ─────────────────────────────────────────
+function showPage(id,btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleTheme() {
+  isLight=!isLight;
+  document.documentElement.classList.toggle('light',isLight);
+  const btn=document.getElementById('theme-btn');
+  if(btn)btn.textContent=isLight?'☀️':'🌙';
+  rebuildCharts();
+  if(expandedId)buildExpandChart(document.querySelector('.de-metric-btn.active')?.textContent||'pts');
+  localStorage.setItem('jgr-ncs-theme',isLight?'light':'dark');
+}
+
+function initTheme() {
+  const saved=localStorage.getItem('jgr-ncs-theme');
+  if(saved==='light'){isLight=true;document.documentElement.classList.add('light');const btn=document.getElementById('theme-btn');if(btn)btn.textContent='☀️';}
+}
+
+// ── BOOT ──
+initTheme();
+loadData();
+</script>
+</body>
+</html>
