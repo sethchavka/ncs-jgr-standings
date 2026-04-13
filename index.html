@@ -48,7 +48,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .theme-btn:hover{border-color:var(--line3);color:var(--text);}
 
 /* ── SHELL ── */
-.shell{display:grid;grid-template-columns:var(--sidebar) 1fr;height:calc(100vh - var(--hdr));margin-top:var(--hdr);overflow:hidden;}
+.shell{display:grid;grid-template-columns:var(--sidebar) 1fr;min-height:calc(100vh - var(--hdr));margin-top:var(--hdr);}
 
 /* ── SIDEBAR ── */
 .sidebar{background:var(--bg2);border-right:1px solid var(--line2);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dc-stat-v.red{color:var(--red);}
 
 /* ── MAIN CONTENT ── */
-.main-content{overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.main-content{overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;min-height:0;}
 .main-content::-webkit-scrollbar{width:4px;}
 .main-content::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 .page{display:none;padding:14px 18px 24px;}
@@ -193,10 +193,66 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .sec-note{font-size:11px;color:var(--text3);}
 .sec-marker{display:inline-block;background:rgba(227,24,55,0.1);border:1px solid rgba(227,24,55,0.3);color:var(--jgr);font-family:var(--font-d);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:3px;margin-left:8px;vertical-align:middle;}
 
+/* ── DRIVER CARDS GRID ── */
+.driver-cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;}
+
+/* ── CHARTS ROW ── */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0;}
+
+/* ── MOBILE SUMMARY STRIP (hidden on desktop) ── */
+.mobile-summary{display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;}
+.ms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);}
+.ms-cell{background:var(--bg3);padding:10px 12px;}
+.ms-label{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:3px;}
+.ms-val{font-family:var(--font-d);font-weight:900;font-size:18px;line-height:1;color:var(--text);}
+.ms-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+.ms-prog{padding:10px 12px;border-top:1px solid var(--line);}
+.ms-prog-row{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;color:var(--text2);}
+.ms-prog-track{height:4px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.ms-prog-fill{height:100%;border-radius:3px;background:var(--jgr);}
+
 /* ── RESPONSIVE ── */
-@media(max-width:1100px){.metrics-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:800px){:root{--sidebar:0px;}.shell{grid-template-columns:1fr;}.sidebar{display:none;}.driver-expand.open{grid-template-columns:1fr;}.metrics-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:540px){:root{--hdr:40px;}.metrics-grid{grid-template-columns:1fr;}.dc-stats{grid-template-columns:repeat(2,1fr);}.tb-pills{display:none;}.tb-divider{display:none;}}
+@media(max-width:1100px){
+  .charts-row{grid-template-columns:1fr;}
+  .metrics-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:800px){
+  :root{--sidebar:0px;}
+  .shell{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .driver-expand.open{display:flex;flex-direction:column;}
+  .driver-expand.open .de-chart{border-right:none;border-bottom:1px solid var(--line);}
+  .driver-expand.open .de-stats{border-right:none;border-bottom:1px solid var(--line);max-height:none;}
+  .metrics-grid{grid-template-columns:repeat(2,1fr);}
+  .driver-cards-grid{grid-template-columns:repeat(2,1fr);}
+  .mobile-summary{display:block;}
+  .charts-row{grid-template-columns:1fr;}
+}
+@media(max-width:540px){
+  :root{--hdr:44px;}
+  .tb-title{font-size:15px;letter-spacing:0.8px;}
+  .tb-sub{display:none;}
+  .tb-pills{display:none;}
+  .tb-divider{display:none;}
+  .tb-logo{width:30px;height:30px;font-size:11px;}
+  .nav-btn{padding:4px 10px;font-size:11px;}
+  .page{padding:10px 10px 24px;}
+  .driver-cards-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .dc-num{font-size:40px;min-width:48px;}
+  .dc-name{font-size:16px;}
+  .dc-pts-big{font-size:26px;}
+  .dc-stats{grid-template-columns:repeat(2,1fr);}
+  .metrics-grid{grid-template-columns:1fr;}
+  .driver-expand.open .de-stats{padding:10px;}
+  .panel-body{padding:8px;}
+  .mt{font-size:11px;}
+  .mt th,.mt td{padding:4px 6px;}
+  .chart-wrap[style*="height:300px"]{height:220px !important;}
+  .chart-wrap[style*="height:260px"]{height:200px !important;}
+}
+@media(max-width:380px){
+  .driver-cards-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -258,8 +314,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
     <!-- DASHBOARD PAGE -->
     <div class="page active" id="page-dashboard">
 
+  <!-- MOBILE SUMMARY STRIP (shows on mobile instead of sidebar) -->
+  <div class="mobile-summary" id="mobile-summary">
+    <div class="ms-grid">
+      <div class="ms-cell"><div class="ms-label">Race</div><div class="ms-val" id="ms-race">—</div><div class="ms-sub">of 36</div></div>
+      <div class="ms-cell"><div class="ms-label">Series Leader</div><div class="ms-val" id="ms-leader">—</div><div class="ms-sub" id="ms-leader-pts">—</div></div>
+      <div class="ms-cell"><div class="ms-label">Chase Cutline P16</div><div class="ms-val" id="ms-cutline">—</div><div class="ms-sub">pts</div></div>
+      <div class="ms-cell"><div class="ms-label">Races to Cutoff</div><div class="ms-val" id="ms-to-cutoff">—</div><div class="ms-sub">remaining</div></div>
+    </div>
+    <div class="ms-prog">
+      <div class="ms-prog-row"><span>Regular Season</span><span id="ms-reg-prog">—</span></div>
+      <div class="ms-prog-track"><div class="ms-prog-fill" id="ms-reg-fill"></div></div>
+      <div class="ms-prog-row"><span>Full Season</span><span id="ms-full-prog">—</span></div>
+      <div class="ms-prog-track"><div class="ms-prog-fill" id="ms-full-fill"></div></div>
+    </div>
+  </div>
+
       <!-- 4 driver cards — fixed layout -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;" id="driver-cards-dash"></div>
+      <div class="driver-cards-grid" id="driver-cards-dash"></div>
 
       <!-- Expand panel -->
       <div class="de-wrap">
@@ -319,7 +391,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
           <div class="panel-title">Key Metrics Comparison</div>
           <div class="panel-note" id="metrics-note">Through Race —</div>
         </div>
-        <div class="panel-body" style="padding:0;">
+        <div class="panel-body" style="padding:0;overflow-x:auto;-webkit-overflow-scrolling:touch;">
           <table class="mt">
             <thead><tr>
               <th>Driver</th><th>Points</th><th>Rank</th><th>vs Cutline</th>
@@ -535,6 +607,18 @@ function updateSidebar() {
   document.getElementById('sb-full-fill').style.width = `${(rd/36)*100}%`;
   document.getElementById('sb-to-cutoff').textContent = Math.max(0,26-rd);
 
+  // Mobile summary strip
+  const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const setW  = (id,w) => { const el=document.getElementById(id); if(el) el.style.width=w; };
+  setEl('ms-race', rd);
+  setEl('ms-leader', DATA.leaderName);
+  setEl('ms-leader-pts', `${DATA.leaderPts} pts`);
+  setEl('ms-cutline', CUTLINE());
+  setEl('ms-to-cutoff', Math.max(0,26-rd));
+  setEl('ms-reg-prog', `${rd} / 26`);
+  setEl('ms-full-prog', `${rd} / 36`);
+  setW('ms-reg-fill',  `${Math.min((rd/26)*100,100)}%`);
+  setW('ms-full-fill', `${(rd/36)*100}%`);
 }
 
 // ─────────────────────────────────────────
@@ -863,7 +947,7 @@ function rebuildCharts() {
       {label:'P16 Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5C842',borderDash:[8,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#F5C842',fill:false,spanGaps:false},
     ]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tt},
-      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:9},autoSkip:false,maxRotation:45,minRotation:45}},
+      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:window.innerWidth<540?7:9},autoSkip:false,maxRotation:45,minRotation:45}},
               y:{min:0,grid:{color:gc},ticks:{color:tc,font:{size:11}},title:{display:true,text:'Cumulative Points',color:tc,font:{size:11}}}}}
   });
 
