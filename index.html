@@ -399,6 +399,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
               <th>vs Leader</th><th>Avg Pts</th><th>Avg Start</th><th>Avg Finish</th>
               <th>Poles</th><th>Wins</th><th>Stg Wins</th><th>Stg Pts</th>
               <th>Top 5</th><th>Top 10</th><th>DNF</th><th>Laps Led</th>
+              <th>% Laps Led</th><th>% in T5</th>
               <th>Avg RP</th><th>Avg RP S1</th><th>Avg RP S2</th><th>Avg RP S3</th>
               <th>Proj R26</th><th>Proj R36</th>
             </tr></thead>
@@ -477,7 +478,8 @@ const DRIVER_META = [
    arp:   [11.11,17.59,17.96,5.25,4.58,11.8,1.34,7.18,2.08],
    arpS1: [12.29,25.35,15.65,6.15,1.95,11.41,1.08,11.62,1.10],
    arpS2: [4.78,18.97,26.71,3.89,11.22,6.38,1.0,5.8,2.79],
-   arpS3: [14.88,9.7,14.61,6.1,1.15,16.78,1.58,5.39,2.34]},
+   arpS3: [14.88,9.7,14.61,6.1,1.15,16.78,1.58,5.39,2.34],
+   lapsT5:[38,47,2,128,177,56,342,159,245]},
   {id:'briscoe', first:'Chase',      last:'Briscoe', car:'19', color:'#E87722',
    finish:[36,2,null,null,8,12,14,5,3],  starts:[2,31,1,16,16,25,27,7,5],
    wins:0, stageWins:0,
@@ -486,7 +488,8 @@ const DRIVER_META = [
    arp:   [22.54,11.8,6.42,9.07,20.09,9.06,20.6,5.91,8.34],
    arpS1: [4.84,23.93,6.8,12.28,22.86,16.21,24.68,7.79,5.45],
    arpS2: [29.95,6.0,7.95,4.96,24.61,6.81,23.12,2.84,8.32],
-   arpS3: [36.0,7.24,3.08,null,13.65,4.14,17.9,6.3,10.81]},
+   arpS3: [36.0,7.24,3.08,null,13.65,4.14,17.9,6.3,10.81],
+   lapsT5:[38,79,26,24,0,119,0,185,43]},
   {id:'bell',    first:'Christopher',last:'Bell',    car:'20', color:'#C8102E',
    finish:[null,21,3,2,4,19,7,27,20],   starts:[12,30,6,11,1,19,11,10,11],
    wins:0, stageWins:2,
@@ -495,7 +498,8 @@ const DRIVER_META = [
    arp:   [12.71,16.4,9.26,2.65,2.94,16.3,9.01,24.05,6.12],
    arpS1: [14.19,24.7,11.3,6.18,3.1,17.62,13.12,4.83,10.71],
    arpS2: [17.15,15.69,9.38,1.25,2.53,13.7,11.04,32.77,5.79],
-   arpS3: [7.52,10.07,8.2,1.37,3.16,17.27,6.51,30.63,2.45]},
+   arpS3: [7.52,10.07,8.2,1.37,3.16,17.27,6.51,30.63,2.45],
+   lapsT5:[45,23,29,186,233,0,6,70,167]},
   {id:'tgibbs',  first:'Ty',         last:'Gibbs',   car:'54', color:'#1D9E3E',
    finish:[23,null,4,4,5,6,4,1,9],     starts:[17,28,8,12,3,24,4,9,6],
    wins:1, stageWins:1,
@@ -504,7 +508,8 @@ const DRIVER_META = [
    arp:   [17.86,19.84,10.88,6.9,8.73,10.97,3.38,7.66,7.00],
    arpS1: [9.6,20.63,10.05,10.62,3.55,19.02,4.67,15.32,5.50],
    arpS2: [19.93,16.15,8.81,6.85,15.3,9.55,2.01,8.97,7.97],
-   arpS3: [24.36,null,12.34,3.92,7.7,4.47,3.4,2.93,7.47]},
+   arpS3: [24.36,null,12.34,3.92,7.7,4.47,3.4,2.93,7.47],
+   lapsT5:[18,0,14,82,92,72,338,215,48]},
 ];
 
 // ─────────────────────────────────────────
@@ -595,6 +600,13 @@ const avgARP  = d => arrAvg(d.arp||[]);
 const avgARP_S1 = d => arrAvg(d.arpS1||[]);
 const avgARP_S2 = d => arrAvg(d.arpS2||[]);
 const avgARP_S3 = d => arrAvg(d.arpS3||[]);
+
+// Green flag laps per race (from XML timing files — used for % calculations)
+const GREEN_LAPS = [165,201,83,218,245,264,343,429,252];
+const totalGreenLaps = () => GREEN_LAPS.slice(0, DATA.racesDone).reduce((a,b)=>a+b,0);
+const lapsT5Total   = d => (d.lapsT5||[]).reduce((a,b)=>a+(b||0),0);
+const pctLapsLed = d => { const t=totalGreenLaps(); return t ? (lapsLedTotal(d)/t*100).toFixed(1)+'%' : '—'; };
+const pctLapsT5  = d => { const t=totalGreenLaps(); return t ? (lapsT5Total(d)/t*100).toFixed(1)+'%'  : '—'; };
 const projP  = (d,t) => { const n=nRaced(d); if(!n) return '—'; return Math.round(lPts(d)+(lPts(d)/n)*(t-DATA.racesDone)); };
 const CUTLINE = () => DATA.cutlineByRace[DATA.racesDone-1]||0;
 
@@ -717,6 +729,8 @@ function expandDriver(id) {
     ${statRow('Stage Wins · Pts', `${d.stageWins||0} · ${stagePtsTotal(d)}`)}
     ${statRow('Top 5 · Top 10', `${top5(d)} · ${top10(d)}`)}
     ${statRow('Laps Led', lapsLedTotal(d)||0)}
+    ${statRow('% Laps Led', pctLapsLed(d), lapsLedTotal(d)>0?d.color:'')}
+    ${statRow('% Laps in Top 5', pctLapsT5(d), lapsT5Total(d)>0?d.color:'')}
     ${statRow('Avg Running Pos', avgARP(d), d.color)}
     ${statRow('Avg RP Stage 1', avgARP_S1(d))}
     ${statRow('Avg RP Stage 2', avgARP_S2(d))}
@@ -755,6 +769,7 @@ function expandDriver(id) {
     {key:'pts',label:'Cum. Points'},{key:'start',label:'Start Pos'},
     {key:'finish',label:'Finish Pos'},{key:'ptsGained',label:'Pts/Race'},
     {key:'stagePts',label:'Stage Pts'},{key:'lapsLed',label:'Laps Led'},
+    {key:'pctLapsLed',label:'% Laps Led'},{key:'pctLapsT5',label:'% in T5'},
     {key:'arp',label:'Avg Run Pos'},{key:'arpS1',label:'ARP Stage 1'},
     {key:'arpS2',label:'ARP Stage 2'},{key:'arpS3',label:'ARP Stage 3'},
     {key:'rank',label:'Chase Rank'},
@@ -789,8 +804,10 @@ function buildExpandChart(key) {
     start:{label:'Start Position',type:'line',reversed:true,data:RACES.slice(0,rd).map((_,i)=>(d.starts||[])[i]??null)},
     ptsGained:{label:'Points per Race',type:'line',reversed:false,data:RACES.slice(0,rd).map((_,i)=>gain(d,i))},
     stagePts:{label:'Stage Points',type:'bar',reversed:false,data:RACES.slice(0,rd).map((_,i)=>(d.stagePtsPerRace||[])[i]??null)},
-    lapsLed:{label:'Laps Led',type:'bar',reversed:false,data:RACES.slice(0,rd).map((_,i)=>(d.lapsLed||[])[i]??null)},
-    arp:    {label:'Avg Running Pos',type:'line',reversed:true,data:(d.arp||[]).slice(0,rd).map(v=>v??null)},
+    lapsLed:    {label:'Laps Led',                    type:'bar',  reversed:false, data:RACES.slice(0,rd).map((_,i)=>(d.lapsLed||[])[i]??null)},
+    pctLapsLed: {label:'% Laps Led',                  type:'bar',  reversed:false, data:RACES.slice(0,rd).map((_,i)=>{ const gl=GREEN_LAPS[i]; return gl?+((( d.lapsLed||[])[i]||0)/gl*100).toFixed(1):null; })},
+    pctLapsT5:  {label:'% Laps in Top 5',             type:'bar',  reversed:false, data:RACES.slice(0,rd).map((_,i)=>{ const gl=GREEN_LAPS[i]; return gl?+((( d.lapsT5||[])[i]||0)/gl*100).toFixed(1):null; })},
+    arp:        {label:'Avg Running Pos',              type:'line', reversed:true,  data:(d.arp||[]).slice(0,rd).map(v=>v??null)},
     arpS1:  {label:'Avg Running Pos — Stage 1',type:'line',reversed:true,data:(d.arpS1||[]).slice(0,rd).map(v=>v??null)},
     arpS2:  {label:'Avg Running Pos — Stage 2',type:'line',reversed:true,data:(d.arpS2||[]).slice(0,rd).map(v=>v??null)},
     arpS3:  {label:'Avg Running Pos — Stage 3',type:'line',reversed:true,data:(d.arpS3||[]).slice(0,rd).map(v=>v??null)},
@@ -814,8 +831,10 @@ function buildExpandChart(key) {
     datasets.push({label:'3-race avg',data:ma,borderColor:'rgba(255,255,255,0.45)',borderDash:[4,3],borderWidth:1.5,pointRadius:0,tension:0.4,fill:false,spanGaps:true,type:'line'});
   }
   if(cfg.cutline){datasets.push({label:'Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5C842',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:false,type:'line'});}
-  const yOpts={grid:{color:gc},ticks:{color:tc,font:{size:10}}};
+  const isPct = ['pctLapsLed','pctLapsT5'].includes(key);
+  const yOpts={grid:{color:gc},ticks:{color:tc,font:{size:10},callback:isPct?v=>v+'%':undefined}};
   if(cfg.reversed){const vals=cfg.data.filter(v=>v!=null);const mx=vals.length?Math.max(...vals):40;yOpts.min=1;yOpts.max=mx+2;}
+  else if(isPct){yOpts.min=0;yOpts.max=100;}
   expandChart=new Chart(document.getElementById('de-canvas').getContext('2d'),{
     type:cfg.type,data:{labels,datasets},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt}},scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}},y:yOpts}}
@@ -876,6 +895,8 @@ function buildMetricsTable() {
       <td class="${top10(d)>0?'mv-g':''}">${top10(d)}</td>
       <td class="${dnf(d)>0?'mv-r':''}">${dnf(d)}</td>
       <td class="${lapsLedTotal(d)>0?'mv-g':''}">${lapsLedTotal(d)}</td>
+      <td class="${lapsLedTotal(d)>0?'mv-g':''}">${pctLapsLed(d)}</td>
+      <td class="${lapsT5Total(d)>0?'mv-g':''}">${pctLapsT5(d)}</td>
       <td>${avgARP(d)}</td>
       <td>${avgARP_S1(d)}</td>
       <td>${avgARP_S2(d)}</td>
@@ -910,6 +931,8 @@ function buildMetricsPage() {
       {k:'Top 5 Finishes',     v:top5(d),               c:top5(d)>0?'gold':''},
       {k:'Top 10 Finishes',    v:top10(d),              c:top10(d)>0?'gold':''},
       {k:'Laps Led',           v:lapsLedTotal(d),       c:lapsLedTotal(d)>0?'gold':''},
+      {k:'% Laps Led',         v:pctLapsLed(d),         c:lapsLedTotal(d)>0?'gold':''},
+      {k:'% Laps in Top 5',    v:pctLapsT5(d),          c:lapsT5Total(d)>0?'gold':''},
       {k:'Avg Running Pos',    v:avgARP(d),             c:''},
       {k:'Avg RP — Stage 1',   v:avgARP_S1(d),          c:''},
       {k:'Avg RP — Stage 2',   v:avgARP_S2(d),          c:''},
@@ -935,17 +958,19 @@ function buildMetricsPage() {
 // MAIN CHART — switchable, all 4 drivers
 // ─────────────────────────────────────────
 const MAIN_METRICS = [
-  {key:'pts',       label:'Cum. Points',  primary:true},
-  {key:'finish',    label:'Finish Pos',   primary:true},
-  {key:'start',     label:'Start Pos',    primary:true},
-  {key:'ptsGained', label:'Pts / Race',   primary:true},
-  {key:'stagePts',  label:'Stage Pts',    primary:true},
-  {key:'lapsLed',   label:'Laps Led',     primary:true},
-  {key:'rank',      label:'Chase Rank',   primary:true},
-  {key:'arp',       label:'Avg Run Pos',  primary:false},
-  {key:'arpS1',     label:'ARP Stage 1',  primary:false},
-  {key:'arpS2',     label:'ARP Stage 2',  primary:false},
-  {key:'arpS3',     label:'ARP Stage 3',  primary:false},
+  {key:'pts',        label:'Cum. Points',  primary:true},
+  {key:'finish',     label:'Finish Pos',   primary:true},
+  {key:'start',      label:'Start Pos',    primary:true},
+  {key:'ptsGained',  label:'Pts / Race',   primary:true},
+  {key:'stagePts',   label:'Stage Pts',    primary:true},
+  {key:'lapsLed',    label:'Laps Led',     primary:true},
+  {key:'rank',       label:'Chase Rank',   primary:true},
+  {key:'arp',        label:'Avg Run Pos',  primary:false},
+  {key:'arpS1',      label:'ARP Stage 1',  primary:false},
+  {key:'arpS2',      label:'ARP Stage 2',  primary:false},
+  {key:'arpS3',      label:'ARP Stage 3',  primary:false},
+  {key:'pctLapsLed', label:'% Laps Led',   primary:false},
+  {key:'pctLapsT5',  label:'% in T5',      primary:false},
 ];
 let mainMetricKey = 'pts';
 
@@ -971,10 +996,18 @@ function getMainData(d, key, rd, cutoff) {
     case 'stagePts':  return Array.from({length:rd},(_,i)=>(d.stagePtsPerRace||[])[i]??null);
     case 'lapsLed':   return Array.from({length:rd},(_,i)=>(d.lapsLed||[])[i]??null);
     case 'rank':      return Array.from({length:rd},(_,i)=>d.rank[i]??null);
-    case 'arp':       return (d.arp||[]).slice(0,rd).map(v=>v??null);
-    case 'arpS1':     return (d.arpS1||[]).slice(0,rd).map(v=>v??null);
-    case 'arpS2':     return (d.arpS2||[]).slice(0,rd).map(v=>v??null);
-    case 'arpS3':     return (d.arpS3||[]).slice(0,rd).map(v=>v??null);
+    case 'arp':        return (d.arp||[]).slice(0,rd).map(v=>v??null);
+    case 'arpS1':      return (d.arpS1||[]).slice(0,rd).map(v=>v??null);
+    case 'arpS2':      return (d.arpS2||[]).slice(0,rd).map(v=>v??null);
+    case 'arpS3':      return (d.arpS3||[]).slice(0,rd).map(v=>v??null);
+    case 'pctLapsLed': return Array.from({length:rd},(_,i)=>{
+      const gl=GREEN_LAPS[i]; if(!gl) return null;
+      return +((( d.lapsLed||[])[i]||0)/gl*100).toFixed(1);
+    });
+    case 'pctLapsT5':  return Array.from({length:rd},(_,i)=>{
+      const gl=GREEN_LAPS[i]; if(!gl) return null;
+      return +((( d.lapsT5||[])[i]||0)/gl*100).toFixed(1);
+    });
     default: return [];
   }
 }
@@ -1034,9 +1067,13 @@ function buildMainChart() {
 
   const allVals=datasets.flatMap(ds=>ds.data||[]).filter(v=>v!=null);
   const maxVal=allVals.length?Math.max(...allVals):40;
-  const yOpts={grid:{color:gc},ticks:{color:tc,font:{size:11}},title:{display:true,text:meta.label,color:tc,font:{size:11}}};
+  const isPct = ['pctLapsLed','pctLapsT5'].includes(key);
+  const yOpts={grid:{color:gc},
+    ticks:{color:tc,font:{size:11},callback: isPct ? v=>v+'%' : undefined},
+    title:{display:true,text:meta.label,color:tc,font:{size:11}}};
   if(reversed){yOpts.min=1;yOpts.max=maxVal+2;}
   else if(key==='pts'){yOpts.min=0;}
+  else if(isPct){yOpts.min=0;yOpts.max=100;}
 
   chartPts=new Chart(document.getElementById('chart-points').getContext('2d'),{
     type:isBar?'bar':'line', data:{labels,datasets},
