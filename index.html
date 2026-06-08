@@ -397,7 +397,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
               <th>Poles</th><th>Wins</th><th>Stg Wins</th><th>Stg Pts</th>
               <th>Top 5</th><th>Top 10</th><th>DNF</th><th>Laps Led</th>
               <th>% Laps Led</th><th>% in T5</th>
-              <th>Avg RP</th><th>Avg RP S1</th><th>Avg RP S2</th><th>Avg RP S3</th>
+              <th>Avg RP</th>
               <th>Proj R26</th><th>Proj R36</th>
             </tr></thead>
             <tbody id="metrics-tbody"></tbody>
@@ -1113,9 +1113,6 @@ function buildMetricsTable() {
       <td class="${lapsLedTotal(d)>0?'mv-g':''}">${pctLapsLed(d)}</td>
       <td class="${lapsT5Total(d)>0?'mv-g':''}">${pctLapsT5(d)}</td>
       <td>${avgARP(d)}</td>
-      <td>${avgARP_S1(d)}</td>
-      <td>${avgARP_S2(d)}</td>
-      <td>${avgARP_S3(d)}</td>
       <td class="${typeof p26==='number'&&p26>=cut?'mv-gr':'mv-r'}">${p26}</td>
       <td>${p36}</td>
     </tr>`;
