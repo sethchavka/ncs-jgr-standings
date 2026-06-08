@@ -5,28 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2026 NCS JGR Points Standings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --red:#E8192C; --red-dim:rgba(232,25,44,0.1); --red-glow:rgba(232,25,44,0.25);
-  --gold:#F5A623; --gold-dim:rgba(245,166,35,0.1);
-  --green:#00C37A; --green-dim:rgba(0,195,122,0.08);
-  --jgr:#E8192C;
+  --red:#E8192C; --red-dim:rgba(232,25,44,0.1); --line-red:rgba(232,25,44,0.2);
+  --gold:#F5A623;
+  --green:#00C37A;
 
   --bg:#080A10; --bg2:#0E1018; --bg3:#141720; --bg4:#1B1E2A;
   --bg5:#202430; --bg6:#262B38;
 
-  --line:rgba(255,255,255,0.07); --line2:rgba(255,255,255,0.13);
-  --line3:rgba(255,255,255,0.28); --line-red:rgba(232,25,44,0.2);
+  --line:rgba(255,255,255,0.07); --line2:rgba(255,255,255,0.13); --line3:rgba(255,255,255,0.28);
 
   --text:#F4F5F8; --text2:#B8BCCB; --text3:#6E7280;
 
   --font-d:'Barlow Condensed',sans-serif;
-  --font-b:'Barlow',sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
+  --font-b:'Inter',sans-serif;
 
-  --hdr:52px; --sidebar:288px; --radius:0px; --gap:10px;
+  --hdr:52px; --sidebar:288px; --gap:10px;
   --transition:0.12s ease;
 }
 html.light {
@@ -38,7 +35,7 @@ html.light {
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.5;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;}
 *{scrollbar-width:thin;scrollbar-color:var(--bg5) transparent;}
 ::-webkit-scrollbar{width:2px;height:2px;}
 ::-webkit-scrollbar-thumb{background:var(--bg6);border-radius:1px;}
@@ -50,35 +47,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
   background:var(--bg2);border-bottom:1px solid var(--line2);
   box-shadow:inset 3px 0 0 var(--red);
 }
-.tb-brand{display:flex;align-items:center;gap:14px;padding:0 18px 0 16px;flex-shrink:0;border-right:1px solid var(--line2);}
-.tb-logo{
-  width:32px;height:32px;background:var(--red);
-  clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-d);font-weight:900;font-size:11px;color:#fff;letter-spacing:0.5px;
-  flex-shrink:0;box-shadow:0 2px 12px rgba(232,25,44,0.4);
-}
-.tb-wordmark{display:flex;flex-direction:column;gap:1px;}
-.tb-title{font-family:var(--font-d);font-weight:900;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--text);line-height:1;}
-.tb-sub{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;}
-.tb-divider{width:1px;background:var(--line2);margin:0;align-self:stretch;}
+.tb-brand{display:flex;align-items:center;padding:0 20px;flex-shrink:0;border-right:1px solid var(--line2);}
+.tb-title{font-family:var(--font-d);font-weight:900;font-size:18px;letter-spacing:2px;text-transform:uppercase;color:var(--text);white-space:nowrap;}
 .tb-pills{display:flex;align-items:stretch;flex:1;overflow:hidden;}
-.pill{display:flex;flex-direction:column;justify-content:center;padding:0 14px;border-right:1px solid var(--line);min-width:0;}
-.pill-lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);line-height:1;margin-bottom:2px;}
-.pill-val{font-family:var(--font-mono);font-size:12px;color:var(--text);line-height:1;white-space:nowrap;}
+.pill{display:flex;flex-direction:column;justify-content:center;padding:0 14px;border-right:1px solid var(--line);min-width:0;gap:2px;}
+.pill-lbl{font-family:var(--font-b);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.2px;color:var(--text3);line-height:1;}
+.pill-val{font-family:var(--font-b);font-size:13px;font-weight:600;color:var(--text);line-height:1;white-space:nowrap;}
 .pill-val.accent{color:var(--gold);}
 .tb-right{display:flex;align-items:stretch;flex-shrink:0;}
 .tb-nav{display:flex;align-items:stretch;border-left:1px solid var(--line2);}
 .nav-btn{
-  font-family:var(--font-d);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  padding:0 20px;border:none;border-right:1px solid var(--line);
+  font-family:var(--font-b);font-size:12px;font-weight:600;letter-spacing:0.3px;
+  padding:0 18px;border:none;border-right:1px solid var(--line);
   background:transparent;color:var(--text2);cursor:pointer;transition:var(--transition);position:relative;white-space:nowrap;
 }
 .nav-btn::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red);transform:scaleX(0);transition:transform 0.15s;}
 .nav-btn.active{color:var(--text);background:var(--red-dim);}
 .nav-btn.active::after{transform:scaleX(1);}
 .nav-btn:hover:not(.active){color:var(--text);background:var(--bg3);}
-.theme-btn{width:52px;border:none;border-left:1px solid var(--line2);background:transparent;color:var(--text3);cursor:pointer;font-size:14px;transition:var(--transition);}
+.theme-btn{width:48px;border:none;border-left:1px solid var(--line2);background:transparent;color:var(--text3);cursor:pointer;font-size:16px;line-height:var(--hdr);transition:var(--transition);}
 .theme-btn:hover{background:var(--bg3);color:var(--text);}
 
 /* SHELL */
@@ -87,40 +74,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 /* SIDEBAR */
 .sidebar{background:var(--bg2);border-right:1px solid var(--line2);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;}
 .sb-sec{padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0;}
-.sb-lbl{font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sb-lbl{font-family:var(--font-b);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .sb-lbl::after{content:'';flex:1;height:1px;background:var(--line2);}
 .prog-row{margin-bottom:10px;}
 .prog-row:last-child{margin-bottom:0;}
 .prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
 .prog-label{font-size:12px;color:var(--text2);}
-.prog-val{font-family:var(--font-mono);font-weight:700;font-size:12px;color:var(--text);}
+.prog-val{font-family:var(--font-b);font-weight:700;font-size:12px;color:var(--text);}
 .prog-track{height:3px;background:var(--bg5);}
 .prog-fill{height:100%;transition:width 0.6s cubic-bezier(.4,0,.2,1);}
 .chase-list{list-style:none;}
 .chase-item{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);}
 .chase-item:last-child{border-bottom:none;}
-.ci-pos{font-family:var(--font-mono);font-weight:700;font-size:11px;color:var(--text3);text-align:right;}
+.ci-pos{font-family:var(--font-b);font-weight:700;font-size:11px;color:var(--text3);text-align:right;}
 .ci-name{font-size:13px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px;}
 .ci-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;}
-.ci-pts{font-family:var(--font-mono);font-weight:700;font-size:12px;color:var(--text);}
-.chase-cutline-sep{padding:4px 0;margin:2px 0;border-top:1px solid var(--line-red);border-bottom:1px solid var(--line-red);background:var(--red-dim);font-family:var(--font-mono);font-size:9px;font-weight:700;text-align:center;letter-spacing:2px;text-transform:uppercase;color:var(--red);}
-.jgr-driver-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line);}
-.jgr-driver-row:last-child{border-bottom:none;}
-.jdr-num{font-family:var(--font-d);font-weight:900;font-size:22px;min-width:34px;text-align:center;line-height:1;}
-.jdr-info{flex:1;}
-.jdr-name{font-size:13px;font-weight:600;color:var(--text);}
-.jdr-pos{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:0.5px;}
-.jdr-pts{text-align:right;}
-.jdr-pts-val{font-family:var(--font-d);font-weight:700;font-size:17px;}
-.jdr-gap{font-family:var(--font-mono);font-size:9px;color:var(--text3);}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.stat-box{background:var(--bg4);padding:8px 10px;border:1px solid var(--line);}
-.stat-box-l{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:3px;}
-.stat-box-v{font-family:var(--font-mono);font-weight:700;font-size:20px;line-height:1;}
-.stat-box-v.red{color:var(--red);}
-.stat-box-v.gold{color:var(--gold);}
-.stat-box-v.green{color:var(--green);}
-.stat-box-s{font-size:9px;color:var(--text3);margin-top:3px;}
+.ci-pts{font-family:var(--font-b);font-weight:700;font-size:12px;color:var(--text);}
+.chase-cutline-sep{padding:4px 0;margin:2px 0;border-top:1px solid var(--line-red);border-bottom:1px solid var(--line-red);background:var(--red-dim);font-family:var(--font-b);font-size:9px;font-weight:700;text-align:center;letter-spacing:2px;text-transform:uppercase;color:var(--red);}
 
 /* MAIN */
 .main-content{overflow-y:auto;overflow-x:hidden;background:var(--bg);display:flex;flex-direction:column;}
@@ -132,24 +102,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .driver-card:hover{border-color:var(--line3);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.5);}
 .driver-card.active-card{border-top-width:2px;}
 .driver-card.dimmed{opacity:0.18;transform:none !important;filter:grayscale(1);}
-.dc-accent{height:2px;width:100%;}
 .dc-top{display:flex;align-items:flex-start;gap:10px;padding:10px 12px 0;}
 .dc-num{font-family:var(--font-d);font-weight:900;font-size:48px;line-height:0.9;letter-spacing:-2px;opacity:0.85;flex-shrink:0;}
 .dc-info{flex:1;min-width:0;padding-top:4px;}
 .dc-name{font-family:var(--font-d);font-weight:700;font-size:17px;line-height:1;letter-spacing:0.5px;text-transform:uppercase;}
-.dc-car{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.5px;margin-top:3px;}
+.dc-car{font-family:var(--font-b);font-size:9px;color:var(--text3);letter-spacing:0.5px;margin-top:3px;}
 .dc-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
-.badge{font-family:var(--font-mono);font-size:9px;padding:2px 6px;letter-spacing:1px;text-transform:uppercase;border:1px solid currentColor;}
+.badge{font-family:var(--font-b);font-size:9px;padding:2px 6px;letter-spacing:1px;text-transform:uppercase;border:1px solid currentColor;}
 .b-out{color:var(--text3);border-color:var(--line2);}
 .dc-pts-row{display:flex;align-items:baseline;gap:8px;padding:8px 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg3);}
-.dc-pts-big{font-family:var(--font-mono);font-weight:700;font-size:28px;line-height:1;letter-spacing:-1px;}
-.dc-pts-lbl{font-family:var(--font-mono);font-size:10px;color:var(--text3);}
-.dc-pts-gap{font-family:var(--font-mono);font-size:12px;font-weight:700;margin-left:auto;}
+.dc-pts-big{font-family:var(--font-b);font-weight:700;font-size:28px;line-height:1;letter-spacing:-1px;}
+.dc-pts-lbl{font-family:var(--font-b);font-size:10px;color:var(--text3);}
+.dc-pts-gap{font-family:var(--font-b);font-size:12px;font-weight:700;margin-left:auto;}
 .dc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:none;}
 .dc-stat{padding:7px 8px;text-align:center;border-right:1px solid var(--line);background:var(--bg2);}
 .dc-stat:last-child{border-right:none;}
-.dc-stat-l{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:3px;}
-.dc-stat-v{font-family:var(--font-mono);font-weight:700;font-size:16px;line-height:1;}
+.dc-stat-l{font-family:var(--font-b);font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:3px;}
+.dc-stat-v{font-family:var(--font-b);font-weight:700;font-size:16px;line-height:1;}
 .dc-stat-v.gold{color:var(--gold);}
 .dc-stat-v.green{color:var(--green);}
 .dc-stat-v.red{color:var(--red);}
@@ -157,28 +126,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 /* PANEL */
 .panel{background:var(--bg2);border:1px solid var(--line2);flex-shrink:0;overflow:hidden;}
 .panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg3);}
-.panel-title{font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text);}
-.panel-note{font-family:var(--font-mono);font-size:10px;color:var(--text3);}
+.panel-title{font-family:var(--font-b);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text);}
+.panel-note{font-family:var(--font-b);font-size:10px;color:var(--text3);}
 .panel-body{padding:12px;}
 
 /* CHARTS */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);flex-shrink:0;}
 .chart-wrap{position:relative;width:100%;}
 .legend{display:flex;gap:12px;flex-wrap:wrap;}
-.leg-item{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--text2);}
+.leg-item{display:flex;align-items:center;gap:6px;font-family:var(--font-b);font-size:10px;color:var(--text2);}
 .leg-dot{width:6px;height:6px;flex-shrink:0;}
 
 /* METRIC BUTTONS */
 .metric-btns-wrap,.de-metric-btns-wrap{display:flex;flex-wrap:wrap;gap:2px;padding:6px 10px;border-bottom:1px solid var(--line);}
-.de-metric-btn,.metric-btn{font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:4px 10px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:var(--transition);}
+.de-metric-btn,.metric-btn{font-family:var(--font-b);font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:4px 10px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:var(--transition);}
 .de-metric-btn.active,.metric-btn.active{background:var(--red-dim);color:var(--red);border-color:var(--line-red);}
 .de-metric-btn:hover:not(.active),.metric-btn:hover:not(.active){color:var(--text2);background:var(--bg4);}
 
 /* TABLES */
 .mt{width:100%;border-collapse:collapse;font-size:12px;}
-.mt th{font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:7px 10px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;background:var(--bg3);position:sticky;top:0;z-index:1;}
+.mt th{font-family:var(--font-b);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:7px 10px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;background:var(--bg3);position:sticky;top:0;z-index:1;}
 .mt th:first-child{text-align:left;}
-.mt td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;color:var(--text2);white-space:nowrap;font-family:var(--font-mono);font-size:11px;}
+.mt td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;color:var(--text2);white-space:nowrap;font-family:var(--font-b);font-size:11px;}
 .mt td:first-child{text-align:left;color:var(--text);font-family:var(--font-b);font-size:13px;}
 .mt tr:last-child td{border-bottom:none;}
 .mt tr:hover td{background:var(--bg4);}
@@ -197,7 +166,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .mc-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 14px;border-bottom:1px solid var(--line);}
 .mc-row:last-child{border-bottom:none;}
 .mc-key{font-size:11px;color:var(--text3);}
-.mc-val{font-family:var(--font-mono);font-weight:700;font-size:13px;}
+.mc-val{font-family:var(--font-b);font-weight:700;font-size:13px;}
 .mc-val.red{color:var(--red);}
 .mc-val.gold{color:var(--gold);}
 .mc-val.green{color:var(--green);}
@@ -208,17 +177,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .driver-expand.open{display:grid;grid-template-columns:190px 1fr 1fr;}
 .de-stats{padding:12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
 .de-stat{padding:7px 9px;border:1px solid var(--line);background:var(--bg3);}
-.de-stat-l{font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:2px;}
-.de-stat-v{font-family:var(--font-mono);font-weight:700;font-size:15px;line-height:1.1;color:var(--text);}
-.de-stat-s{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:1px;}
+.de-stat-l{font-family:var(--font-b);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:2px;}
+.de-stat-v{font-family:var(--font-b);font-weight:700;font-size:15px;line-height:1.1;color:var(--text);}
+.de-stat-s{font-family:var(--font-b);font-size:9px;color:var(--text3);margin-top:1px;}
 .de-chart{padding:12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:8px;}
-.de-chart-hdr{font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);}
+.de-chart-hdr{font-family:var(--font-b);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);}
 .de-log{padding:12px;overflow-y:auto;}
-.de-log-hdr{font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;}
+.de-log-hdr{font-family:var(--font-b);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;}
 .de-table{width:100%;border-collapse:collapse;}
-.de-table th{font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);padding:4px 7px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;position:sticky;top:0;background:var(--bg2);}
+.de-table th{font-family:var(--font-b);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);padding:4px 7px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;position:sticky;top:0;background:var(--bg2);}
 .de-table th:first-child,.de-table th:nth-child(2){text-align:left;}
-.de-table td{padding:4px 7px;border-bottom:1px solid var(--line);text-align:right;color:var(--text2);white-space:nowrap;font-family:var(--font-mono);font-size:11px;}
+.de-table td{padding:4px 7px;border-bottom:1px solid var(--line);text-align:right;color:var(--text2);white-space:nowrap;font-family:var(--font-b);font-size:11px;}
 .de-table td:first-child{text-align:left;color:var(--text3);}
 .de-table td:nth-child(2){text-align:left;color:var(--text);font-family:var(--font-b);}
 .de-table tr:last-child td{border-bottom:none;}
@@ -226,13 +195,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .de-close{position:absolute;top:8px;right:10px;width:22px;height:22px;font-size:12px;color:var(--text3);cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;border:1px solid var(--line2);background:var(--bg4);transition:var(--transition);}
 .de-close:hover{color:var(--text);border-color:var(--line3);}
 
-.proj-btn{font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--line2);background:var(--bg4);color:var(--text3);cursor:pointer;transition:var(--transition);}
+.proj-btn{font-family:var(--font-b);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--line2);background:var(--bg4);color:var(--text3);cursor:pointer;transition:var(--transition);}
 .proj-btn:hover{border-color:var(--line3);color:var(--text2);}
 
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--line2);flex-shrink:0;}
 .sec-title{font-family:var(--font-d);font-weight:900;font-size:16px;text-transform:uppercase;letter-spacing:2px;}
-.sec-note{font-family:var(--font-mono);font-size:10px;color:var(--text3);}
-.sec-marker{font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line-red);color:var(--red);background:var(--red-dim);margin-left:10px;vertical-align:middle;}
+.sec-note{font-family:var(--font-b);font-size:10px;color:var(--text3);}
+.sec-marker{font-family:var(--font-b);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line-red);color:var(--red);background:var(--red-dim);margin-left:10px;vertical-align:middle;}
 
 /* DRIVER CARDS GRID */
 .driver-cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);flex-shrink:0;}
@@ -241,11 +210,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .mobile-summary{display:none;background:var(--bg2);border:1px solid var(--line2);overflow:hidden;}
 .ms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);}
 .ms-cell{background:var(--bg3);padding:10px 13px;}
-.ms-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:3px;}
-.ms-val{font-family:var(--font-mono);font-weight:700;font-size:17px;line-height:1;color:var(--text);}
-.ms-sub{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px;}
+.ms-label{font-family:var(--font-b);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:3px;}
+.ms-val{font-family:var(--font-b);font-weight:700;font-size:17px;line-height:1;color:var(--text);}
+.ms-sub{font-family:var(--font-b);font-size:9px;color:var(--text3);margin-top:2px;}
 .ms-prog{padding:10px 13px;border-top:1px solid var(--line);}
-.ms-prog-row{display:flex;justify-content:space-between;margin-bottom:4px;font-family:var(--font-mono);font-size:10px;color:var(--text2);}
+.ms-prog-row{display:flex;justify-content:space-between;margin-bottom:4px;font-family:var(--font-b);font-size:10px;color:var(--text2);}
 .ms-prog-track{height:3px;background:var(--bg5);margin-bottom:6px;}
 .ms-prog-fill{height:100%;background:var(--red);}
 
@@ -281,11 +250,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 
 <header class="top-bar">
   <div class="tb-brand">
-    <div class="tb-logo">JGR</div>
-    <div class="tb-wordmark">
-      <div class="tb-title">2026 NCS · JGR Points</div>
-      <div class="tb-sub">Cup Series · Joe Gibbs Racing</div>
-    </div>
+    <div class="tb-title">2026 NCS · JGR</div>
   </div>
   <div class="tb-pills">
     <div class="pill"><span class="pill-lbl">Race</span><span class="pill-val accent" id="hdr-race">—</span></div>
@@ -313,15 +278,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
       <div class="sb-lbl">Season Progress</div>
       <div class="prog-row">
         <div class="prog-top"><span class="prog-label">Regular Season</span><span class="prog-val" id="sb-reg-prog">—</span></div>
-        <div class="prog-track"><div class="prog-fill" id="sb-reg-fill" style="background:var(--jgr);"></div></div>
+        <div class="prog-track"><div class="prog-fill" id="sb-reg-fill" style="background:var(--red);"></div></div>
       </div>
       <div class="prog-row">
         <div class="prog-top"><span class="prog-label">Full Season</span><span class="prog-val" id="sb-full-prog">—</span></div>
-        <div class="prog-track"><div class="prog-fill" id="sb-full-fill" style="background:var(--jgr);"></div></div>
+        <div class="prog-track"><div class="prog-fill" id="sb-full-fill" style="background:var(--red);"></div></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
         <span style="font-size:11px;color:var(--text3);">Races to cutoff: <b style="color:var(--text2);" id="sb-to-cutoff">—</b></span>
-        <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:2px;color:var(--red);text-transform:uppercase;">R26 CUTOFF</span>
+        <span style="font-family:var(--font-b);font-size:9px;font-weight:700;letter-spacing:2px;color:var(--red);text-transform:uppercase;">R26 CUTOFF</span>
       </div>
     </div>
 
@@ -395,15 +360,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
       <!-- Main multi-metric chart — all 4 drivers -->
       <div class="panel">
         <div class="panel-hdr">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1;">
-            <div class="panel-title" id="main-chart-title">Cumulative Points</div>
+          <div class="panel-title" id="main-chart-title">Cumulative Points</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button id="proj-toggle" class="proj-btn" onclick="toggleProjections()">Proj Off</button>
             <div id="legend-points" class="legend"></div>
           </div>
-          <div id="main-chart-btns" style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;flex-shrink:0;"></div>
         </div>
-        <div class="metric-btns-wrap" id="main-chart-secondary-btns" style="padding:6px 10px;"></div>
+        <div style="padding:6px 13px;border-bottom:1px solid var(--line2);background:var(--bg3);display:flex;gap:4px;flex-wrap:wrap;" id="main-metric-btns"></div>
         <div class="panel-body">
-          <div class="chart-wrap" style="height:300px;"><canvas id="chart-points" role="img" aria-label="Multi-metric chart for all 4 JGR drivers"></canvas></div>
+          <div class="chart-wrap" style="height:260px;"><canvas id="chart-points"></canvas></div>
         </div>
       </div>
 
@@ -479,7 +444,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
           <div class="sec-note">Plot JGR cars against top field drivers · race-by-race cumulative points</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <select id="cmp-metric" onchange="buildCompare()" style="font-family:var(--font-mono);font-size:11px;background:var(--bg4);color:var(--text2);border:1px solid var(--line2);padding:5px 10px;cursor:pointer;outline:none;">
+          <select id="cmp-metric" onchange="buildCompare()" style="font-family:var(--font-b);font-size:11px;background:var(--bg4);color:var(--text2);border:1px solid var(--line2);padding:5px 10px;cursor:pointer;outline:none;">
             <option value="pts">Cumulative Points</option>
             <option value="finish">Finish Position</option>
             <option value="momentum">5-Race Momentum</option>
@@ -492,7 +457,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
           <div class="panel-note">JGR always on · click to add/remove</div>
         </div>
         <div class="panel-body" style="padding:10px 12px;">
-          <div style="font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px;">Field Drivers (current top 20)</div>
+          <div style="font-family:var(--font-b);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px;">Field Drivers (current top 20)</div>
           <div id="cmp-field-toggles" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
         </div>
       </div>
@@ -659,7 +624,7 @@ const QUAL_FIELD = [
 ];
 
 // ─────────────────────────────────────────
-// DEFAULT DATA — through R8 Bristol
+// DEFAULT DATA — through R15 Michigan
 // ─────────────────────────────────────────
 const DEFAULT_DATA = {
   racesDone: 15,
@@ -798,11 +763,11 @@ function buildMomentumDash() {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
         <div>
           <div style="font-family:var(--font-d);font-weight:900;font-size:15px;color:${d.color};letter-spacing:0.5px;text-transform:uppercase;">#${d.car} ${d.last}</div>
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:1px;">AVG ${avg} pts/race</div>
+          <div style="font-family:var(--font-b);font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:1px;">AVG ${avg} pts/race</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-family:var(--font-mono);font-weight:700;font-size:20px;color:${scoreCol};line-height:1;">${scoreStr}</div>
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1px;">MOMENTUM</div>
+          <div style="font-family:var(--font-b);font-weight:700;font-size:20px;color:${scoreCol};line-height:1;">${scoreStr}</div>
+          <div style="font-family:var(--font-b);font-size:9px;color:var(--text3);letter-spacing:1px;">MOMENTUM</div>
         </div>
       </div>
       <div style="position:relative;height:72px;"><canvas id="mom-chart-${d.id}"></canvas></div>
@@ -926,7 +891,6 @@ function buildDriverCards() {
     const dc=isCut?'gold':(diff>=0?'green':'red');
     const dt=isCut?'On cutline':(diff>0?`+${diff}`:`${diff}`);
     return `<div class="driver-card" data-id="${d.id}" onclick="expandDriver('${d.id}')" style="border-top-color:${d.color};">
-      <div class="dc-accent" style="background:${d.color};"></div>
       <div class="dc-top">
         <div class="dc-num" style="color:${d.color}bb;">#${d.car}</div>
         <div class="dc-info">
@@ -1023,9 +987,7 @@ function expandDriver(id) {
     {key:'finish',label:'Finish Pos'},{key:'ptsGained',label:'Pts/Race'},
     {key:'stagePts',label:'Stage Pts'},{key:'lapsLed',label:'Laps Led'},
     {key:'pctLapsLed',label:'% Laps Led'},{key:'pctLapsT5',label:'% in T5'},
-    {key:'arp',label:'Avg Run Pos'},{key:'arpS1',label:'ARP Stage 1'},
-    {key:'arpS2',label:'ARP Stage 2'},{key:'arpS3',label:'ARP Stage 3'},
-    {key:'rank',label:'Chase Rank'},
+    {key:'arp',label:'Avg Run Pos'},
   ];
   document.getElementById('de-metric-btns').innerHTML = metrics.map(m=>
     `<button class="de-metric-btn${m.key==='pts'?' active':''}" style="${m.key==='pts'?`color:${d.color};`:''}" onclick="setExpandMetric('${m.key}')">${m.label}</button>`
@@ -1211,33 +1173,35 @@ function buildMetricsPage() {
 // MAIN CHART — switchable, all 4 drivers
 // ─────────────────────────────────────────
 const MAIN_METRICS = [
-  {key:'pts',        label:'Cum. Points',  primary:true},
-  {key:'finish',     label:'Finish Pos',   primary:true},
-  {key:'start',      label:'Start Pos',    primary:true},
-  {key:'ptsGained',  label:'Pts / Race',   primary:true},
-  {key:'stagePts',   label:'Stage Pts',    primary:true},
-  {key:'lapsLed',    label:'Laps Led',     primary:true},
-  {key:'rank',       label:'Chase Rank',   primary:true},
-  {key:'arp',        label:'Avg Run Pos',  primary:false},
-  {key:'arpS1',      label:'ARP Stage 1',  primary:false},
-  {key:'arpS2',      label:'ARP Stage 2',  primary:false},
-  {key:'arpS3',      label:'ARP Stage 3',  primary:false},
-  {key:'pctLapsLed', label:'% Laps Led',   primary:false},
-  {key:'pctLapsT5',  label:'% in T5',      primary:false},
+  {key:'pts',        label:'Cum. Points',   reversed:false, cumulative:true},
+  {key:'finish',     label:'Finish Pos',    reversed:true,  cumulative:false},
+  {key:'start',      label:'Start Pos',     reversed:true,  cumulative:false},
+  {key:'ptsGained',  label:'Pts / Race',    reversed:false, cumulative:false},
+  {key:'stagePts',   label:'Stage Pts',     reversed:false, cumulative:false},
+  {key:'lapsLed',    label:'Laps Led',      reversed:false, cumulative:false},
+  {key:'arp',        label:'Avg Run Pos',   reversed:true,  cumulative:false},
+  {key:'pctLapsLed', label:'% Laps Led',    reversed:false, cumulative:false},
+  {key:'pctLapsT5',  label:'% in T5',       reversed:false, cumulative:false},
 ];
 let mainMetricKey = 'pts';
 
-function buildMainChartButtons() {
-  const mk = mainMetricKey;
-  const btn = m => `<button class="de-metric-btn${m.key===mk?' active':''}" style="${m.key===mk?'border-color:currentColor;color:'+(DRIVERS.find(x=>true)?.color||'#fff'):''}" onclick="switchMainMetric('${m.key}')">${m.label}</button>`;
-  document.getElementById('main-chart-btns').innerHTML           = MAIN_METRICS.filter(m=>m.primary).map(btn).join('');
-  document.getElementById('main-chart-secondary-btns').innerHTML = MAIN_METRICS.filter(m=>!m.primary).map(btn).join('');
+function setMainMetric(key) {
+  mainMetricKey = key;
+  document.querySelectorAll('.main-metric-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.key === key);
+  });
+  updateProjToggleVisibility();
+  buildMainChart();
 }
 
-function switchMainMetric(key) {
-  mainMetricKey = key;
-  buildMainChartButtons();
-  buildMainChart();
+function buildMainChartButtons() {
+  const container = document.getElementById('main-metric-btns');
+  if(!container) return;
+  container.innerHTML = MAIN_METRICS.map(m =>
+    `<button class="de-metric-btn main-metric-btn${m.key===mainMetricKey?' active':''}" data-key="${m.key}"
+      onclick="setMainMetric('${m.key}')">${m.label}</button>`
+  ).join('');
+  updateProjToggleVisibility();
 }
 
 function getMainData(d, key, rd, cutoff) {
@@ -1271,8 +1235,7 @@ function buildMainChart() {
   const tt={backgroundColor:isLight?'#F7F8FB':'#0D0F14',borderColor:isLight?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.08)',borderWidth:1,titleColor:isLight?'#0C0D14':'#F4F5F8',bodyColor:isLight?'#444C60':'#8892A4',padding:10,cornerRadius:0,displayColors:false};
   const gc=isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.06)', tc=isLight?'#9099AE':'#6E7280';
   const meta = MAIN_METRICS.find(m=>m.key===key);
-  const reversed = ['finish','start','rank','arp','arpS1','arpS2','arpS3'].includes(key);
-  const isBar    = ['stagePts','lapsLed','ptsGained'].includes(key);
+  const reversed = ['finish','start','arp'].includes(key);
   const extendToCutoff = key==='pts';
 
   document.getElementById('main-chart-title').textContent = meta.label;
@@ -1283,39 +1246,29 @@ function buildMainChart() {
 
   // Legend
   let legHtml = DRIVERS.map(d=>`<div class="leg-item"><div class="leg-dot" style="background:${d.color};"></div>#${d.car} ${d.last}</div>`).join('');
-  if(key==='pts') legHtml += `<div class="leg-item"><div style="width:14px;height:2px;border-top:2px dashed #F5C842;margin-top:3px;"></div>P16 cut</div>`;
+  if(key==='pts') legHtml += `<div class="leg-item"><div style="width:14px;height:2px;border-top:2px dashed #F5A623;margin-top:3px;"></div>P16 cut</div>`;
   document.getElementById('legend-points').innerHTML = legHtml;
 
   const datasets = [];
-  if(!isBar) {
-    DRIVERS.forEach(d=>{
-      datasets.push({
-        label:`#${d.car} ${d.last}`, data:getMainData(d,key,rd,cutoff),
-        borderColor:d.color, backgroundColor:d.color+'15',
-        borderWidth:2.5, pointRadius:4, pointHoverRadius:6,
-        tension:0.35, fill:false, spanGaps:false,
-      });
+  DRIVERS.forEach(d=>{
+    datasets.push({
+      label:`#${d.car} ${d.last}`, data:getMainData(d,key,rd,cutoff),
+      borderColor:d.color, backgroundColor:d.color+'15',
+      borderWidth:2.5, pointRadius:3, pointHoverRadius:5,
+      tension:0.35, fill:false, spanGaps:false,
     });
-    if(key==='pts') {
-      DRIVERS.forEach(d=>{
-        const lastPts=lPts(d), n=nRaced(d);
-        if(!n||!lastPts){datasets.push({label:`#${d.car} proj`,data:Array(cutoff).fill(null),hidden:true,borderColor:d.color});return;}
-        const rate=lastPts/n;
-        const lastIdx=(()=>{for(let j=rd-1;j>=0;j--)if(d.pts[j]!=null)return j;return -1;})();
-        const arr=Array(cutoff).fill(null);
-        if(lastIdx>=0)for(let j=lastIdx;j<cutoff;j++)arr[j]=Math.round(lastPts+rate*(j-lastIdx));
-        datasets.push({label:`#${d.car} proj`,data:arr,borderColor:d.color,borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0,fill:false,spanGaps:false,hidden:!showProjections});
-      });
-      datasets.push({label:'P16 Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5A623',borderDash:[8,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#F5A623',fill:false,spanGaps:false});
-    }
-  } else {
+  });
+  if(key==='pts') {
     DRIVERS.forEach(d=>{
-      datasets.push({
-        label:`#${d.car} ${d.last}`, data:getMainData(d,key,rd,cutoff),
-        backgroundColor:d.color+'bb', borderColor:d.color,
-        borderWidth:1, borderRadius:2,
-      });
+      const lastPts=lPts(d), n=nRaced(d);
+      if(!n||!lastPts){datasets.push({label:`#${d.car} proj`,data:Array(cutoff).fill(null),hidden:true,borderColor:d.color});return;}
+      const rate=lastPts/n;
+      const lastIdx=(()=>{for(let j=rd-1;j>=0;j--)if(d.pts[j]!=null)return j;return -1;})();
+      const arr=Array(cutoff).fill(null);
+      if(lastIdx>=0)for(let j=lastIdx;j<cutoff;j++)arr[j]=Math.round(lastPts+rate*(j-lastIdx));
+      datasets.push({label:`#${d.car} proj`,data:arr,borderColor:d.color,borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0,fill:false,spanGaps:false,hidden:!showProjections});
     });
+    datasets.push({label:'P16 Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5A623',borderDash:[8,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#F5A623',fill:false,spanGaps:false});
   }
 
   const allVals=datasets.flatMap(ds=>ds.data||[]).filter(v=>v!=null);
@@ -1329,7 +1282,7 @@ function buildMainChart() {
   else if(isPct){yOpts.min=0;yOpts.max=100;}
 
   chartPts=new Chart(document.getElementById('chart-points').getContext('2d'),{
-    type:isBar?'bar':'line', data:{labels,datasets},
+    type:'line', data:{labels,datasets},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
       tooltip:{...tt,callbacks:{
         title:ctx=>RACES[ctx[0].dataIndex]?`R${RACES[ctx[0].dataIndex].n} ${RACES[ctx[0].dataIndex].track}`:'',
@@ -1357,7 +1310,19 @@ function buildMainChart() {
 
 function toggleProjections() {
   showProjections=!showProjections;
+  const btn=document.getElementById('proj-toggle');
+  if(btn){
+    btn.textContent=showProjections?'Proj On':'Proj Off';
+    btn.style.background=showProjections?'var(--red-dim)':'';
+    btn.style.borderColor=showProjections?'var(--line-red)':'';
+    btn.style.color=showProjections?'var(--red)':'';
+  }
   if(mainMetricKey==='pts') buildMainChart();
+}
+
+function updateProjToggleVisibility() {
+  const btn=document.getElementById('proj-toggle');
+  if(btn) btn.style.display=mainMetricKey==='pts'?'':'none';
 }
 
 function rebuildCharts() {
@@ -1371,8 +1336,8 @@ function rebuildCharts() {
 
   const standings=DATA.standings||[];
   const p16pts=standings[15]?.pts||0;
-  const barColors=standings.map(s=>{if(!s.jgr)return'rgba(255,255,255,0.1)';const d=DRIVERS.find(dr=>dr.id===s.dId);return d?d.color:'var(--jgr)';});
-  const barBorders=standings.map(s=>{if(!s.jgr)return'rgba(255,255,255,0.15)';const d=DRIVERS.find(dr=>dr.id===s.dId);return d?d.color:'var(--jgr)';});
+  const barColors=standings.map(s=>{if(!s.jgr)return'rgba(255,255,255,0.1)';const d=DRIVERS.find(dr=>dr.id===s.dId);return d?d.color:'var(--red)';});
+  const barBorders=standings.map(s=>{if(!s.jgr)return'rgba(255,255,255,0.15)';const d=DRIVERS.find(dr=>dr.id===s.dId);return d?d.color:'var(--red)';});
   chartStandings=new Chart(document.getElementById('chart-standings').getContext('2d'),{
     type:'bar',
     data:{labels:standings.map(s=>`P${s.pos}`),datasets:[
@@ -1440,12 +1405,12 @@ function buildQualOrder() {
     const metricDisplay = row.metric.toFixed(2);
     const posColor = row.jgr ? color : 'var(--text3)';
     return `<tr style="${rowBg}">
-      <td style="font-family:var(--font-mono);font-weight:700;color:${posColor};">~${i+1}</td>
+      <td style="font-family:var(--font-b);font-weight:700;color:${posColor};">~${i+1}</td>
       <td>${carDisplay}</td>
-      <td>${driverDisplay}${row.jgr?` <span style="font-family:var(--font-mono);font-size:9px;color:${color};letter-spacing:1px;border:1px solid ${color}55;padding:1px 4px;">JGR</span>`:''}</td>
-      <td style="font-family:var(--font-mono);color:var(--text2);">${finDisplay}</td>
-      <td style="font-family:var(--font-mono);color:var(--text2);">P${row.ownerRank<=40?row.ownerRank:'—'}</td>
-      <td style="font-family:var(--font-mono);font-weight:700;color:${row.jgr?color:'var(--text)'};">${metricDisplay}</td>
+      <td>${driverDisplay}${row.jgr?` <span style="font-family:var(--font-b);font-size:9px;color:${color};letter-spacing:1px;border:1px solid ${color}55;padding:1px 4px;">JGR</span>`:''}</td>
+      <td style="font-family:var(--font-b);color:var(--text2);">${finDisplay}</td>
+      <td style="font-family:var(--font-b);color:var(--text2);">P${row.ownerRank<=40?row.ownerRank:'—'}</td>
+      <td style="font-family:var(--font-b);font-weight:700;color:${row.jgr?color:'var(--text)'};">${metricDisplay}</td>
     </tr>`;
   }).join('');
 }
@@ -1482,7 +1447,7 @@ function initCompareToggles() {
   document.getElementById('cmp-field-toggles').innerHTML = field.map((f,i) => {
     const color = colors[i % colors.length];
     return `<button id="cmp-toggle-${f.id}" onclick="toggleCmpDriver('${f.id}','${color}','${f.car}','${f.first} ${f.last}')"
-      style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;
+      style="font-family:var(--font-b);font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;
         padding:4px 10px;border:1px solid var(--line2);background:var(--bg4);color:var(--text3);cursor:pointer;transition:var(--transition);">
       <span id="cmp-dot-${f.id}" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text3);margin-right:4px;vertical-align:middle;"></span>
       #${f.car} ${f.last}
