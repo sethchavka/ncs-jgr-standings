@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>2026 NCS JGR Points Standings</title>
+<title>2026 NCS · JGR Points Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
   --red:#E8192C; --red-dim:rgba(232,25,44,0.1); --line-red:rgba(232,25,44,0.2);
-  --gold:#F5A623;
+  --gold:#F0D000;
   --green:#00C37A;
 
   --bg:#080A10; --bg2:#0E1018; --bg3:#141720; --bg4:#1B1E2A;
@@ -124,7 +124,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
 .dc-stat-v.red{color:var(--red);}
 
 /* PANEL */
-.panel{background:var(--bg2);border:1px solid var(--line2);flex-shrink:0;overflow:hidden;}
+.panel{background:var(--bg2);border:1px solid var(--line2);flex-shrink:0;}
 .panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg3);}
 .panel-title{font-family:var(--font-b);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text);}
 .panel-note{font-family:var(--font-b);font-size:10px;color:var(--text3);}
@@ -451,13 +451,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
           </select>
         </div>
       </div>
+
       <div class="panel">
         <div class="panel-hdr">
           <div class="panel-title">Select Field Drivers</div>
           <div class="panel-note">JGR always on · click to add/remove</div>
         </div>
         <div class="panel-body" style="padding:10px 12px;">
-          <div style="font-family:var(--font-b);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px;">Field Drivers (current top 20)</div>
           <div id="cmp-field-toggles" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
         </div>
       </div>
@@ -467,7 +467,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
           <div style="display:flex;gap:8px;flex-wrap:wrap;" id="cmp-legend"></div>
         </div>
         <div class="panel-body">
-          <div class="chart-wrap" style="height:320px;"><canvas id="cmp-chart"></canvas></div>
+          <div class="chart-wrap" id="cmp-chart-wrap"><canvas id="cmp-chart"></canvas></div>
         </div>
       </div>
       <div class="panel">
@@ -582,7 +582,7 @@ const DRIVER_META = [
 // Updated each race: {car, driver, lastFin, ownerRank, jgr}
 // ─────────────────────────────────────────
 const QUAL_FIELD = [
-  // R15 Michigan results + R15 driver pts standings
+  // Last race finish (R15 Michigan) + driver pts rank (R15)
   {car:'11', driver:'Denny Hamlin',          lastFin:1,  ownerRank:2,  jgr:true},
   {car:'43', driver:'Erik Jones',             lastFin:2,  ownerRank:18, jgr:false},
   {car:'23', driver:'Bubba Wallace',          lastFin:3,  ownerRank:11, jgr:false},
@@ -623,6 +623,34 @@ const QUAL_FIELD = [
   {car:'8',  driver:'Kyle Busch',             lastFin:null, ownerRank:36, jgr:false},
 ];
 
+// Field driver race-by-race data (R1-R15) — sourced from official NASCAR PDFs
+const FIELD_DRIVERS = [
+  {car:'45',first:'Tyler',last:'Reddick',color:'#3B82F6',pts:[58, 125, 186, 225, 255, 325, 353, 386, 457, 484, 526, 567, 620, 657, 669],finish:[1, 1, 1, 8, 13, 1, 15, 4, 1, 14, 4, 5, 4, 6, 35]},
+  {car:'12',first:'Ryan',last:'Blaney',color:'#8B5CF6',pts:[36, 67, 100, 165, 188, 230, 271, 324, 337, 344, 371, 405, 446, 483, 512],finish:[27, 10, 8, 1, 16, 3, 6, 2, 24, 37, 10, 11, 7, 8, 8]},
+  {car:'9',first:'Chase',last:'Elliott',color:'#F97316',pts:[43, 81, 114, 128, 168, 194, 249, 264, 305, 340, 409, 422, 423, 460, 482],finish:[4, 11, 7, 23, 2, 15, 1, 22, 8, 4, 1, 24, 37, 7, 32]},
+  {car:'5',first:'Kyle',last:'Larson',color:'#06B6D4',pts:[29, 42, 73, 109, 157, 176, 206, 260, 314, 315, 318, 332, 386, 409, 453],finish:[16, 32, 6, 3, 7, 32, 9, 3, 2, 40, 34, 23, 5, 23, 4]},
+  {car:'77',first:'Carson',last:'Hocevar',color:'#84CC16',pts:[36, 74, 82, 103, 118, 151, 171, 209, 237, 292, 333, 342, 356, 383, 428],finish:[18, 4, 31, 20, 22, 4, 17, 10, 13, 1, 7, 28, 23, 10, 5]},
+  {car:'17',first:'Chris',last:'Buescher',color:'#EC4899',pts:[39, 61, 81, 111, 146, 188, 206, 230, 259, 309, 345, 375, 385, 393, 424],finish:[7, 15, 24, 14, 6, 9, 19, 13, 10, 2, 5, 12, 30, 29, 9]},
+  {car:'7',first:'Daniel',last:'Suarez',color:'#F59E0B',pts:[35, 67, 87, 98, 117, 150, 167, 192, 210, 235, 271, 295, 336, 378, 418],finish:[13, 5, 25, 30, 18, 7, 20, 12, 19, 12, 6, 13, 1, 19, 6]},
+  {car:'23',first:'Bubba',last:'Wallace',color:'#14B8A6',pts:[37, 85, 116, 153, 194, 205, 206, 236, 275, 276, 304, 313, 328, 338, 378],finish:[10, 8, 11, 6, 9, 34, 36, 11, 5, 36, 9, 29, 22, 32, 3]},
+  {car:'24',first:'William',last:'Byron',color:'#A78BFA',pts:[25, 50, 76, 108, 157, 191, 238, 245, 275, 277, 308, 309, 337, 352, 377],finish:[12, 28, 13, 7, 3, 8, 5, 30, 7, 35, 8, 36, 9, 30, 18]},
+  {car:'97',first:'Shane Van',last:'Gisbergen',color:'#FB923C',pts:[13, 45, 90, 116, 117, 140, 174, 177, 178, 195, 215, 283, 316, 348, 355],finish:[30, 6, 2, 11, 36, 14, 11, 34, 36, 20, 17, 1, 11, 5, 30]},
+  {car:'6',first:'Brad',last:'Keselowski',color:'#6366F1',pts:[39, 61, 78, 100, 127, 182, 206, 229, 264, 279, 311, 318, 343, 347, 350],finish:[5, 17, 20, 15, 10, 2, 13, 14, 6, 31, 13, 30, 15, 34, 34]},
+  {car:'2',first:'Austin',last:'Cindric',color:'#78716C',pts:[13, 34, 39, 52, 71, 109, 149, 172, 197, 226, 248, 287, 288, 306, 332],finish:[34, 26, 32, 34, 19, 5, 8, 16, 12, 8, 15, 9, 38, 26, 11]},
+  {car:'22',first:'Joey',last:'Logano',color:'#0EA5E9',pts:[46, 68, 90, 113, 135, 139, 185, 218, 225, 234, 235, 245, 274, 297, 329],finish:[3, 18, 15, 31, 15, 33, 3, 7, 30, 39, 37, 38, 8, 14, 7]},
+  {car:'43',first:'Erik',last:'Jones',color:'#10B981',pts:[16, 29, 32, 59, 76, 103, 119, 133, 147, 161, 196, 214, 244, 270, 314],finish:[21, 24, 34, 10, 20, 10, 21, 23, 23, 23, 12, 19, 13, 11, 2]},
+  {car:'60',first:'Ryan',last:'Preece',color:'#EF4444',pts:[17, 49, 68, 92, 125, 154, 180, 209, 235, 269, 298, 296, 303, 304, 313],finish:[25, 9, 18, 13, 11, 13, 12, 8, 11, 18, 14, 14, 33, 36, 28]},
+  {car:'71',first:'Michael',last:'McDowell',color:'#D946EF',pts:[26, 43, 83, 111, 122, 139, 158, 171, 174, 179, 189, 225, 248, 275, 286],finish:[22, 20, 5, 9, 26, 20, 18, 24, 34, 32, 27, 2, 14, 15, 26]},
+  {car:'16',first:'AJ',last:'Allmendinger',color:'#64748B',pts:[18, 43, 86, 104, 117, 124, 134, 156, 162, 183, 199, 235, 254, 266, 286],finish:[19, 12, 9, 19, 24, 30, 27, 15, 31, 16, 25, 7, 18, 35, 17]},
+  {car:'38',first:'Zane',last:'Smith',color:'#B45309',pts:[41, 71, 75, 85, 108, 123, 126, 144, 149, 183, 198, 217, 244, 272, 282],finish:[6, 7, 33, 27, 14, 22, 34, 19, 32, 5, 22, 18, 10, 9, 33]},
+  {car:'47',first:'Ricky Stenhouse',last:'Jr.',color:'#DC2626',pts:[39, 40, 49, 64, 72, 80, 87, 107, 123, 161, 187, 193, 222, 263, 271],finish:[2, 36, 28, 22, 29, 29, 30, 17, 21, 6, 19, 31, 12, 4, 29]},
+  {car:'1',first:'Ross',last:'Chastain',color:'#7C3AED',pts:[17, 51, 64, 74, 94, 115, 136, 153, 164, 205, 216, 236, 238, 239, 260],finish:[20, 3, 35, 28, 17, 16, 16, 20, 26, 7, 26, 27, 35, 37, 16]},
+  {car:'34',first:'Todd',last:'Gilliland',color:'#0891B2',pts:[16, 16, 39, 65, 68, 82, 96, 127, 147, 181, 186, 206, 223, 240, 255],finish:[39, 25, 21, 12, 34, 23, 23, 6, 17, 11, 32, 17, 20, 20, 22]},
+  {car:'35',first:'Riley',last:'Herbst',color:'#16A34A',pts:[35, 39, 53, 72, 86, 88, 90, 109, 132, 144, 173, 186, 202, 224, 250],finish:[8, 33, 23, 18, 23, 35, 35, 21, 14, 25, 11, 26, 21, 17, 13]},
+  {car:'3',first:'Austin',last:'Dillon',color:'#9333EA',pts:[17, 17, 35, 56, 81, 93, 105, 124, 145, 163, 182, 220, 225, 244, 245],finish:[37, 29, 19, 16, 12, 25, 25, 18, 16, 19, 18, 6, 32, 18, 36]},
+  {car:'42',first:'John Hunter',last:'Nemechek',color:'#C2410C',pts:[25, 43, 63, 75, 91, 101, 109, 111, 126, 141, 157, 189, 201, 213, 236],finish:[26, 19, 17, 25, 21, 27, 29, 35, 22, 22, 21, 10, 26, 24, 14]},
+];
+
 // ─────────────────────────────────────────
 // DEFAULT DATA — through R15 Michigan
 // ─────────────────────────────────────────
@@ -640,30 +668,30 @@ const DEFAULT_DATA = {
     tgibbs:  {pts:[16,17,65,101,140,173,222,281,319,322,330,372,425,449,470], rank:[26,33,17,15,10,11,6,4,4,5,7,6,4,5,5]},
   },
   standings: [
-    {pos:1,  name:'Tyler Reddick',      car:'45', team:'23XI',     pts:669, jgr:false},
-    {pos:2,  name:'Denny Hamlin',       car:'11', team:'JGR',      pts:618, jgr:true,  dId:'hamlin'},
-    {pos:3,  name:'Ryan Blaney',        car:'12', team:'Penske',   pts:512, jgr:false},
-    {pos:4,  name:'Chase Elliott',      car:'9',  team:'HMS',      pts:482, jgr:false},
-    {pos:5,  name:'Ty Gibbs',           car:'54', team:'JGR',      pts:470, jgr:true,  dId:'tgibbs'},
-    {pos:6,  name:'Kyle Larson',        car:'5',  team:'HMS',      pts:453, jgr:false},
-    {pos:7,  name:'Carson Hocevar',     car:'77', team:'Spire',    pts:428, jgr:false},
-    {pos:8,  name:'Chris Buescher',     car:'17', team:'RFK',      pts:424, jgr:false},
-    {pos:9,  name:'Daniel Suarez',      car:'7',  team:'TCH',      pts:418, jgr:false},
-    {pos:10, name:'Christopher Bell',   car:'20', team:'JGR',      pts:410, jgr:true,  dId:'bell'},
-    {pos:11, name:'Bubba Wallace',      car:'23', team:'23XI',     pts:378, jgr:false},
-    {pos:12, name:'William Byron',      car:'24', team:'HMS',      pts:377, jgr:false},
-    {pos:13, name:'Chase Briscoe',      car:'19', team:'JGR',      pts:370, jgr:true,  dId:'briscoe'},
-    {pos:14, name:'S. Van Gisbergen',   car:'97', team:'Spire',    pts:355, jgr:false},
-    {pos:15, name:'Brad Keselowski',    car:'6',  team:'RFK',      pts:350, jgr:false},
-    {pos:16, name:'Austin Cindric',     car:'2',  team:'Penske',   pts:332, jgr:false},
-    {pos:17, name:'Joey Logano',        car:'22', team:'Penske',   pts:329, jgr:false},
-    {pos:18, name:'Erik Jones',         car:'43', team:'Legacy',   pts:314, jgr:false},
-    {pos:19, name:'Ryan Preece',        car:'60', team:'HFT',      pts:313, jgr:false},
-    {pos:20, name:'M. McDowell',        car:'71', team:'FRM',      pts:286, jgr:false},
-    {pos:21, name:'AJ Allmendinger',    car:'16', team:'Kaulig',   pts:286, jgr:false},
-    {pos:22, name:'Zane Smith',         car:'38', team:'FRM',      pts:282, jgr:false},
-    {pos:23, name:'Ricky Stenhouse Jr.',car:'47', team:'JTG',      pts:271, jgr:false},
-    {pos:24, name:'Ross Chastain',      car:'1',  team:'TCH',      pts:260, jgr:false},
+    {pos:1,  name:'Tyler Reddick',      car:'45', team:'23XI',     pts:669, wins:5, jgr:false},
+    {pos:2,  name:'Denny Hamlin',       car:'11', team:'JGR',      pts:618, wins:3, jgr:true,  dId:'hamlin'},
+    {pos:3,  name:'Ryan Blaney',        car:'12', team:'Penske',   pts:512, wins:0, jgr:false},
+    {pos:4,  name:'Chase Elliott',      car:'9',  team:'HMS',      pts:482, wins:2, jgr:false},
+    {pos:5,  name:'Ty Gibbs',           car:'54', team:'JGR',      pts:470, wins:1, jgr:true,  dId:'tgibbs'},
+    {pos:6,  name:'Kyle Larson',        car:'5',  team:'HMS',      pts:453, wins:0, jgr:false},
+    {pos:7,  name:'Carson Hocevar',     car:'77', team:'Spire',    pts:428, wins:1, jgr:false},
+    {pos:8,  name:'Chris Buescher',     car:'17', team:'RFK',      pts:424, wins:0, jgr:false},
+    {pos:9,  name:'Daniel Suarez',      car:'7',  team:'TCH',      pts:418, wins:1, jgr:false},
+    {pos:10, name:'Christopher Bell',   car:'20', team:'JGR',      pts:410, wins:0, jgr:true,  dId:'bell'},
+    {pos:11, name:'Bubba Wallace',      car:'23', team:'23XI',     pts:378, wins:0, jgr:false},
+    {pos:12, name:'William Byron',      car:'24', team:'HMS',      pts:377, wins:0, jgr:false},
+    {pos:13, name:'Chase Briscoe',      car:'19', team:'JGR',      pts:370, wins:0, jgr:true,  dId:'briscoe'},
+    {pos:14, name:'S. Van Gisbergen',   car:'97', team:'Spire',    pts:355, wins:0, jgr:false},
+    {pos:15, name:'Brad Keselowski',    car:'6',  team:'RFK',      pts:350, wins:0, jgr:false},
+    {pos:16, name:'Austin Cindric',     car:'2',  team:'Penske',   pts:332, wins:0, jgr:false},
+    {pos:17, name:'Joey Logano',        car:'22', team:'Penske',   pts:329, wins:0, jgr:false},
+    {pos:18, name:'Erik Jones',         car:'43', team:'Legacy',   pts:314, wins:0, jgr:false},
+    {pos:19, name:'Ryan Preece',        car:'60', team:'HFT',      pts:313, wins:0, jgr:false},
+    {pos:20, name:'M. McDowell',        car:'71', team:'FRM',      pts:286, wins:0, jgr:false},
+    {pos:21, name:'AJ Allmendinger',    car:'16', team:'Kaulig',   pts:286, wins:0, jgr:false},
+    {pos:22, name:'Zane Smith',         car:'38', team:'FRM',      pts:282, wins:0, jgr:false},
+    {pos:23, name:'Ricky Stenhouse Jr.',car:'47', team:'JTG',      pts:271, wins:0, jgr:false},
+    {pos:24, name:'Ross Chastain',      car:'1',  team:'TCH',      pts:260, wins:0, jgr:false},
   ],
 };
 
@@ -671,7 +699,7 @@ const DEFAULT_DATA = {
 // STATE
 // ─────────────────────────────────────────
 let DATA = null, DRIVERS = [];
-let chartPts = null, chartStandings = null, expandChart = null;
+let chartPts = null, chartStandings = null, expandChart = null, cmpChart = null;
 let expandedId = null, showProjections = false, isLight = false;
 
 // ─────────────────────────────────────────
@@ -739,8 +767,8 @@ function renderAll() {
   buildMetricsPage();
   buildMainChartButtons();
   rebuildCharts();
-  initCompareToggles();
   buildMomentumDash();
+  initCompareToggles();
 }
 
 // Compact momentum strip for dashboard
@@ -1045,7 +1073,7 @@ function buildExpandChart(key) {
     const ma=cfg.data.map((_,i)=>{const sl=cfg.data.slice(Math.max(0,i-w+1),i+1).filter(v=>v!=null);return sl.length>=2?Math.round((sl.reduce((a,b)=>a+b,0)/sl.length)*10)/10:null;});
     datasets.push({label:'3-race avg',data:ma,borderColor:'rgba(255,255,255,0.45)',borderDash:[4,3],borderWidth:1.5,pointRadius:0,tension:0.4,fill:false,spanGaps:true,type:'line'});
   }
-  if(cfg.cutline){datasets.push({label:'Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5A623',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:false,type:'line'});}
+  if(cfg.cutline){datasets.push({label:'Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F0D000',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:false,type:'line'});}
   const isPct = ['pctLapsLed','pctLapsT5'].includes(key);
   const yOpts={grid:{color:gc},ticks:{color:tc,font:{size:10},callback:isPct?v=>v+'%':undefined}};
   if(cfg.reversed){const vals=cfg.data.filter(v=>v!=null);const mx=vals.length?Math.max(...vals):40;yOpts.min=1;yOpts.max=mx+2;}
@@ -1243,7 +1271,7 @@ function buildMainChart() {
 
   // Legend
   let legHtml = DRIVERS.map(d=>`<div class="leg-item"><div class="leg-dot" style="background:${d.color};"></div>#${d.car} ${d.last}</div>`).join('');
-  if(key==='pts') legHtml += `<div class="leg-item"><div style="width:14px;height:2px;border-top:2px dashed #F5A623;margin-top:3px;"></div>P16 cut</div>`;
+  if(key==='pts') legHtml += `<div class="leg-item"><div style="width:14px;height:2px;border-top:2px dashed #F0D000;margin-top:3px;"></div>P16 cut</div>`;
   document.getElementById('legend-points').innerHTML = legHtml;
 
   const datasets = [];
@@ -1265,7 +1293,7 @@ function buildMainChart() {
       if(lastIdx>=0)for(let j=lastIdx;j<cutoff;j++)arr[j]=Math.round(lastPts+rate*(j-lastIdx));
       datasets.push({label:`#${d.car} proj`,data:arr,borderColor:d.color,borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0,fill:false,spanGaps:false,hidden:!showProjections});
     });
-    datasets.push({label:'P16 Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F5A623',borderDash:[8,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#F5A623',fill:false,spanGaps:false});
+    datasets.push({label:'P16 Cutline',data:[...DATA.cutlineByRace.slice(0,rd),...Array(cutoff-rd).fill(null)],borderColor:'#F0D000',borderDash:[8,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#F0D000',fill:false,spanGaps:false});
   }
 
   const allVals=datasets.flatMap(ds=>ds.data||[]).filter(v=>v!=null);
@@ -1339,7 +1367,7 @@ function rebuildCharts() {
     type:'bar',
     data:{labels:standings.map(s=>`P${s.pos}`),datasets:[
       {label:'Points',data:standings.map(s=>s.pts),backgroundColor:barColors,borderColor:barBorders,borderWidth:1,borderRadius:3},
-      {label:'P16 Cutline',data:Array(standings.length).fill(p16pts),type:'line',borderColor:'#F5A623',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false},
+      {label:'P16 Cutline',data:Array(standings.length).fill(p16pts),type:'line',borderColor:'#F0D000',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false},
     ]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{
       title:ctx=>`P${standings[ctx[0].dataIndex].pos} — ${standings[ctx[0].dataIndex].name}`,
@@ -1359,7 +1387,7 @@ function showPage(id,btn) {
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
   if(id==='qualorder') buildQualOrder();
-  if(id==='compare') buildCompare();
+  if(id==='compare') requestAnimationFrame(()=>requestAnimationFrame(buildCompare));
 }
 
 // ─────────────────────────────────────────
@@ -1415,90 +1443,79 @@ function buildQualOrder() {
 // ─────────────────────────────────────────
 // COMPARE
 // ─────────────────────────────────────────
-let cmpActive = new Set();
-let cmpChart = null;
-
-// Field drivers pulled from current standings (non-JGR top 20)
-function getFieldDrivers() {
-  const jgrIds = new Set(DRIVERS.map(d=>d.id));
-  return (DATA.standings||[])
-    .filter(s=>!s.jgr)
-    .slice(0,16)
-    .map(s => ({
-      id: s.name.toLowerCase().replace(/[^a-z]/g,''),
-      first: s.name.split(' ')[0],
-      last: s.name.split(' ').slice(1).join(' '),
-      car: s.car,
-      pts: (DATA.cmpPts||{})[s.name] || Array(DATA.racesDone).fill(null),
-      rank: Array(DATA.racesDone).fill(null),
-      finish: Array(DATA.racesDone).fill(null),
-      color: '#' + Math.abs(s.name.split('').reduce((h,c)=>(h*31+c.charCodeAt(0))|0,0)).toString(16).slice(0,6).padStart(6,'0'),
-    }));
-}
+let cmpSelected = new Set(); // set of car numbers selected
 
 function initCompareToggles() {
-  cmpActive = new Set();
-  const field = getFieldDrivers();
-  const colors = ['#3B82F6','#8B5CF6','#F97316','#06B6D4','#84CC16','#EC4899','#F59E0B','#14B8A6','#A78BFA','#FB923C','#6366F1','#78716C','#0EA5E9','#10B981','#EF4444','#D946EF'];
-
-  document.getElementById('cmp-field-toggles').innerHTML = field.map((f,i) => {
-    const color = colors[i % colors.length];
-    return `<button id="cmp-toggle-${f.id}" onclick="toggleCmpDriver('${f.id}','${color}','${f.car}','${f.first} ${f.last}')"
-      style="font-family:var(--font-b);font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;
-        padding:4px 10px;border:1px solid var(--line2);background:var(--bg4);color:var(--text3);cursor:pointer;transition:var(--transition);">
-      <span id="cmp-dot-${f.id}" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text3);margin-right:4px;vertical-align:middle;"></span>
-      #${f.car} ${f.last}
+  const container = document.getElementById('cmp-field-toggles');
+  if(!container) return;
+  container.innerHTML = FIELD_DRIVERS.map(d => {
+    const active = cmpSelected.has(d.car);
+    const lastName = d.last==='Jr.'?d.first.split(' ').slice(-1)[0]+' Jr.':d.last;
+    return `<button id="cmp-btn-${d.car}"
+      onclick="toggleFieldDriver('${d.car}')"
+      style="font-family:var(--font-b);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;transition:var(--transition);
+        background:${active?d.color+'22':'var(--bg4)'};border:1px solid ${active?d.color+'66':'var(--line2)'};color:${active?d.color:'var(--text3)'};">
+      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle;background:${active?d.color:'var(--text3)'};" id="cmp-dot-${d.car}"></span>#${d.car} ${lastName}
     </button>`;
   }).join('');
 }
 
-const cmpDriverStore = {};
-function toggleCmpDriver(id, color, car, name) {
-  if(cmpActive.has(id)) {
-    cmpActive.delete(id);
-    delete cmpDriverStore[id];
-  } else {
-    cmpActive.add(id);
-    cmpDriverStore[id] = {id, car, name, color};
-  }
-  const btn = document.getElementById(`cmp-toggle-${id}`);
-  const dot = document.getElementById(`cmp-dot-${id}`);
-  if(cmpActive.has(id)) {
-    btn.style.background=color+'22'; btn.style.borderColor=color+'66'; btn.style.color=color;
-    dot.style.background=color;
-  } else {
-    btn.style.background='var(--bg4)'; btn.style.borderColor='var(--line2)'; btn.style.color='var(--text3)';
-    dot.style.background='var(--text3)';
-  }
+function toggleFieldDriver(car) {
+  if(cmpSelected.has(car)) cmpSelected.delete(car);
+  else cmpSelected.add(car);
+  const d = FIELD_DRIVERS.find(x=>x.car===car);
+  if(!d) return;
+  const btn = document.getElementById(`cmp-btn-${car}`);
+  const dot = document.getElementById(`cmp-dot-${car}`);
+  const on = cmpSelected.has(car);
+  if(btn){ btn.style.background=on?d.color+'22':'var(--bg4)'; btn.style.borderColor=on?d.color+'66':'var(--line2)'; btn.style.color=on?d.color:'var(--text3)'; }
+  if(dot){ dot.style.background=on?d.color:'var(--text3)'; }
   buildCompare();
 }
 
 function buildCompare() {
+  if(!DATA || !DRIVERS || !DRIVERS.length) return;
   const rd = DATA.racesDone;
+  if(!rd) return;
+  const canvas = document.getElementById('cmp-chart');
+  if(!canvas) return;
+
   const metric = document.getElementById('cmp-metric')?.value || 'pts';
+  const metricLabels = {pts:'Cumulative Points', finish:'Finish Position', momentum:'Momentum (5-Race Rolling Avg)'};
   const cut = CUTLINE();
-  document.getElementById('cmp-marker').textContent = `R${rd} · ${metric==='pts'?'Cumulative Points':metric==='finish'?'Finish Position':'5-Race Momentum'}`;
-  document.getElementById('cmp-chart-title').textContent = metric==='pts'?'Cumulative Points':metric==='finish'?'Finish Position':'5-Race Momentum';
 
-  const gc = isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.06)', tc=isLight?'#9099AE':'#6E7280';
+  document.getElementById('cmp-marker').textContent = `R${rd} · ${metricLabels[metric]}`;
+  document.getElementById('cmp-chart-title').textContent = `${metricLabels[metric]} — Through R${rd}`;
+
+  const raceLabels = RACES.slice(0,rd).map(r=>r.short);
+  const gc = isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.06)';
+  const tc = isLight?'#9099AE':'#6E7280';
   const tt = {backgroundColor:isLight?'#F7F8FB':'#0D0F14',borderColor:isLight?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.08)',borderWidth:1,titleColor:isLight?'#0C0D14':'#F4F5F8',bodyColor:isLight?'#444C60':'#8892A4',padding:10,cornerRadius:0,displayColors:false};
-  const labels = RACES.slice(0,rd).map(r=>r.short);
 
-  const getData = (d, isJgr) => {
-    if(metric==='pts') return RACES.slice(0,rd).map((_,i)=>d.pts[i]??null);
-    if(metric==='finish') return RACES.slice(0,rd).map((_,i)=>(d.finish||[])[i]??null);
-    if(metric==='momentum') return RACES.slice(0,rd).map((_,i)=>{ const v=rollingAvg(d,i,5); return v!==null?Math.round(v*10)/10:null; });
+  const selectedField = FIELD_DRIVERS.filter(d=>cmpSelected.has(d.car));
+  const allDrivers = [
+    ...DRIVERS.map(d=>({...d, isJgr:true})),
+    ...selectedField.map(d=>({...d, isJgr:false})),
+  ];
+
+  const getData = d => {
+    if(metric==='pts')      return RACES.slice(0,rd).map((_,i)=>d.pts[i]??null);
+    if(metric==='finish')   return RACES.slice(0,rd).map((_,i)=>(d.finish||[])[i]??null);
+    if(metric==='momentum') return RACES.slice(0,rd).map((_,i)=>rollingAvg(d,i,5));
     return [];
   };
 
-  const datasets = [
-    ...DRIVERS.map(d=>({
-      label:`#${d.car} ${d.last}`,data:getData(d,true),
-      borderColor:d.color,backgroundColor:d.color+'18',
-      borderWidth:2.5,pointRadius:3,pointHoverRadius:5,
-      tension:0.3,fill:false,spanGaps:true,
-    })),
-  ];
+  const datasets = allDrivers.map(d=>({
+    label:`#${d.car} ${d.last}`,
+    data:getData(d),
+    borderColor:d.color,
+    backgroundColor:d.color+(d.isJgr?'20':'10'),
+    borderWidth:d.isJgr?2.5:1.5,
+    borderDash:d.isJgr?[]:[5,3],
+    pointRadius:d.isJgr?3:2,
+    pointHoverRadius:6,
+    tension:0.3, fill:false, spanGaps:true,
+  }));
 
   if(metric==='pts') datasets.push({
     label:'P16 Cutline',
@@ -1507,43 +1524,77 @@ function buildCompare() {
     pointRadius:0,fill:false,spanGaps:true,
   });
 
-  // Legend for JGR
-  document.getElementById('cmp-legend').innerHTML = DRIVERS.map(d=>
-    `<div class="leg-item"><div class="leg-dot" style="background:${d.color};"></div>#${d.car} ${d.last}</div>`
+  if(cmpChart){try{cmpChart.destroy();}catch(e){} cmpChart=null;}
+  // Set explicit pixel dimensions so Chart.js doesn't rely on CSS layout
+  const wrap = document.getElementById('cmp-chart-wrap');
+  const wrapW = wrap ? wrap.clientWidth || 800 : 800;
+  canvas.width  = wrapW;
+  canvas.height = 300;
+  canvas.style.width  = wrapW+'px';
+  canvas.style.height = '300px';
+
+  try {
+    cmpChart = new Chart(canvas.getContext('2d'),{
+      type:'line',
+      data:{labels:raceLabels, datasets},
+      options:{
+        responsive:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            backgroundColor:isLight?'#F7F8FB':'#0D0F14',
+            borderColor:isLight?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.08)',
+            borderWidth:1,
+            titleColor:isLight?'#0C0D14':'#F4F5F8',
+            bodyColor:isLight?'#444C60':'#8892A4',
+            padding:10, cornerRadius:0, displayColors:false,
+            callbacks:{
+              title:items=>{ const r=RACES[items[0]?.dataIndex]; return r?`R${r.n} ${r.track}`:''; },
+              label:ctx=>{ const v=ctx.parsed.y; if(v==null) return null; return `${ctx.dataset.label}: ${metric==='finish'?'P'+v:metric==='momentum'?(v>=0?'+':'')+Number(v).toFixed(1)+' pts/race':v+' pts'}`; }
+            }
+          }
+        },
+        scales:{
+          x:{grid:{color:gc}, ticks:{color:tc, font:{size:11}, maxRotation:0}},
+          y:{grid:{color:gc}, ticks:{color:tc, font:{size:11},
+            callback:v=>metric==='finish'?'P'+v:metric==='momentum'?(v>=0?'+':'')+Number(v).toFixed(1):v
+          }}
+        }
+      }
+    });
+  } catch(err) {
+    console.error('Compare chart error:', err);
+  }
+
+  // Legend
+  document.getElementById('cmp-legend').innerHTML = allDrivers.map(d=>
+    `<div class="leg-item">
+      <div class="leg-dot" style="background:${d.isJgr?d.color:'transparent'};border:${d.isJgr?'none':'1.5px dashed '+d.color};width:8px;height:8px;border-radius:50%;flex-shrink:0;"></div>
+      <span style="color:${d.isJgr?d.color:'var(--text2)'};font-weight:${d.isJgr?700:400};">#${d.car} ${d.last}</span>
+    </div>`
   ).join('');
 
+  // Snapshot table
   const finArr = d=>(d.finish||[]).slice(0,rd).filter(v=>v!==null);
-  const avgFin = d=>{ const a=finArr(d); return a.length?(a.reduce((s,v)=>s+v,0)/a.length).toFixed(1):'—'; };
+  const avgFin = d=>{const a=finArr(d);return a.length?(a.reduce((s,v)=>s+v,0)/a.length).toFixed(1):'—';};
 
-  document.getElementById('cmp-table-body').innerHTML = DRIVERS.map(d=>{
-    const pts=d.pts[rd-1]??'—'; const rank=lRank(d);
+  document.getElementById('cmp-table-body').innerHTML = allDrivers.map(d=>{
+    const pts=(d.pts||[])[rd-1]??'—';
+    const standingsEntry = (DATA.standings||[]).find(s=>s.car===d.car);
+    const rank = standingsEntry ? standingsEntry.pos : (d.isJgr ? lRank(d) : null);
     const diff=typeof pts==='number'?pts-cut:null;
     const diffTxt=diff!==null?(diff>=0?`<span style="color:var(--green);">+${diff}</span>`:`<span style="color:var(--red);">${diff}</span>`):'—';
-    return `<tr style="background:${d.color}08;">
-      <td><span style="color:${d.color};font-family:var(--font-d);font-weight:700;">#${d.car}</span> ${d.first} ${d.last}</td>
+    return `<tr style="${d.isJgr?`background:${d.color}08;`:''}">
+      <td><span style="color:${d.color};font-family:var(--font-d);font-weight:700;">#${d.car}</span> ${d.first||''} ${d.last}</td>
       <td>${rank?'P'+rank:'—'}</td>
       <td style="font-family:var(--font-d);font-weight:700;color:${d.color};">${pts}</td>
       <td>${diffTxt}</td>
-      <td>${(d.wins||0)||'—'}</td>
+      <td>${d.isJgr ? (d.wins||0)||'—' : (d.finish||[]).filter(f=>f===1).length||'—'}</td>
       <td>${top5(d)||'—'}</td>
       <td>${top10(d)||'—'}</td>
       <td>${avgFin(d)}</td>
     </tr>`;
   }).join('');
-
-  if(cmpChart){cmpChart.destroy();cmpChart=null;}
-  const wrap=document.getElementById('cmp-chart').parentNode;
-  wrap.innerHTML='<canvas id="cmp-chart"></canvas>';
-  cmpChart=new Chart(document.getElementById('cmp-chart').getContext('2d'),{
-    type:'line',data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...tt,callbacks:{
-        title:ctx=>RACES[ctx[0].dataIndex]?`R${RACES[ctx[0].dataIndex].n} ${RACES[ctx[0].dataIndex].track}`:'',
-        label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y??'—'}`,
-      }}},
-      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:11}}}},
-    }
-  });
 }
 
 function toggleTheme() {
