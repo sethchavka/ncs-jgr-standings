@@ -651,8 +651,8 @@ const FIELD_DRIVERS = [
   {car:'42',first:'John Hunter',last:'Nemechek',color:'#C2410C',pts:[25, 43, 63, 75, 91, 101, 109, 111, 126, 141, 157, 189, 201, 213, 236,277],finish:[26, 19, 17, 25, 21, 27, 29, 35, 22, 22, 21, 10, 26, 24, 14,4]},
 ];
 
-// ─────────────────────────────────────────
-// DEFAULT DATA — through R15 Michigan
+// Race numbers where qualifying was rained out (owner pts grid)
+const RAIN_QUAL = new Set([2, 10, 13]); // Atlanta, Talladega, Charlotte
 // ─────────────────────────────────────────
 const DEFAULT_DATA = {
   racesDone: 16,
@@ -994,7 +994,7 @@ function expandDriver(id) {
     const isWin=fin===1;
     return `<tr>
       <td style="color:var(--text3);">R${r.n}</td><td title="${r.name}">${r.short}</td>
-      <td>${str!=null?str:'—'}</td>
+      <td title="${RAIN_QUAL.has(r.n)?'Rain — owner pts grid':''}" style="${RAIN_QUAL.has(r.n)?'color:#22D3EE;font-weight:600;':''}">${str!=null?str:'—'}</td>
       <td style="color:${isWin?'var(--gold)':'var(--text)'};">${fin!=null?fin:'—'}${isWin?' ★':''}</td>
       <td style="color:${d.color};">${g!=null?'+'+g:'—'}</td>
       <td style="color:${stgPts>0?'var(--gold)':'var(--text3)'};">${stgPts!=null?stgPts:'—'}</td>
