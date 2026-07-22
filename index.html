@@ -508,24 +508,24 @@ const RACES = [
   {n:17, short:'SND',  track:'San Diego',        date:'Jun 21', stages:'20-40-75',     name:'Anduril 250'},
   {n:18, short:'SON',  track:'Sonoma',           date:'Jun 28', stages:'25-55-110',    name:'Toyota/Save Mart 350'},
   {n:19, short:'CHI',  track:'Chicago',          date:'Jul 5',  stages:'80-165-267',   name:'eero 400'},
-  {n:20, short:'IND',  track:'Indianapolis',    date:'Jul 19', stages:'50-100-160',   name:'Brickyard 400'},
-  {n:21, short:'IOW',  track:'Iowa',            date:'Jul 27', stages:'70-210-350',   name:'Iowa Corn 350'},
-  {n:22, short:'RCH',  track:'Richmond',        date:'Aug 3',  stages:'70-230-400',   name:'Cook Out 400'},
-  {n:23, short:'DAY2', track:'Daytona 2',       date:'Aug 16', stages:'35-95-160',    name:'Coke Zero 400'},
-  {n:24, short:'ATL2', track:'Atlanta 2',       date:'Aug 24', stages:'60-160-260',   name:'Quaker State 400'},
-  {n:25, short:'SON',  track:'Sonoma',          date:'Aug 31', stages:'25-55-110',    name:'Toyota/Save Mart 350'},
-  {n:26, short:'DAR2', track:'Darlington 2',    date:'Sep 6',  stages:'115-230-367',  name:'Southern 500 — CUTOFF'},
+  {n:20, short:'ATL',  track:'Atlanta',          date:'Jul 12', stages:'60-160-263',   name:'Quaker State 400'},
+  {n:21, short:'NWB',  track:'N. Wilkesboro',    date:'Jul 19', stages:'80-265-450',   name:'Window World 450'},
+  {n:22, short:'IND',  track:'Indianapolis',    date:'Jul 26', stages:'50-100-160',   name:'Brickyard 400'},
+  {n:23, short:'IOW',  track:'Iowa',            date:'Aug 9',  stages:'70-210-350',   name:'Iowa Corn 350'},
+  {n:24, short:'RCH',  track:'Richmond',        date:'Aug 15', stages:'70-230-400',   name:'Cook Out 400'},
+  {n:25, short:'NWH',  track:'New Hampshire',   date:'Aug 23', stages:'75-185-301',   name:'Ambetter 301'},
+  {n:26, short:'DAY2', track:'Daytona 2',       date:'Aug 29', stages:'35-95-160',    name:'Coke Zero 400'},
+  {n:27, short:'DAR',  track:'Darlington',      date:'Sep 6',  stages:'115-230-367',  name:'Southern 500 — CUTOFF'},
   // ── Chase ────────────────────────────────────────────────────────────
-  {n:27, short:'GAT',  track:'Gateway',         date:'Sep 13', stages:'45-140-240',   name:'Chase R1 · Gateway'},
-  {n:28, short:'BRI2', track:'Bristol 2',       date:'Sep 19', stages:'125-250-500',  name:'Chase R2 · Bristol'},
-  {n:29, short:'LVS2', track:'Las Vegas 2',     date:'Sep 27', stages:'80-165-267',   name:'Chase R3 · Las Vegas'},
-  {n:30, short:'TAL2', track:'Talladega 2',     date:'Oct 5',  stages:'60-120-188',   name:'Chase R4 · Talladega'},
-  {n:31, short:'CLT2', track:'Charlotte 2',     date:'Oct 12', stages:'80-165-267',   name:'Chase R5 · Charlotte'},
-  {n:32, short:'MV2',  track:'Martinsville 2',  date:'Oct 19', stages:'130-260-500',  name:'Chase R6 · Martinsville'},
-  {n:33, short:'PHX2', track:'Phoenix 2',       date:'Oct 26', stages:'60-185-312',   name:'Chase R7 · Phoenix'},
-  {n:34, short:'NWB',  track:'N. Wilkesboro',   date:'Nov 1',  stages:'80-265-450',   name:'Chase R8 · N. Wilkesboro'},
-  {n:35, short:'HOM',  track:'Homestead',       date:'Nov 8',  stages:'80-165-267',   name:'Chase R9 · Homestead — FINALE'},
-  {n:36, short:'HOM2', track:'Homestead',       date:'Nov 8',  stages:'80-165-267',   name:'Homestead'},
+  {n:28, short:'GAT',  track:'Gateway',         date:'Sep 13', stages:'45-140-240',   name:'Chase R1 · Gateway'},
+  {n:29, short:'BRI2', track:'Bristol 2',       date:'Sep 19', stages:'125-250-500',  name:'Chase R2 · Bristol'},
+  {n:30, short:'KAN',  track:'Kansas',          date:'Sep 27', stages:'80-165-267',   name:'Chase R3 · Kansas'},
+  {n:31, short:'LVS2', track:'Las Vegas 2',     date:'Oct 4',  stages:'80-165-267',   name:'Chase R4 · Las Vegas'},
+  {n:32, short:'CLT2', track:'Charlotte 2',      date:'Oct 11', stages:'80-165-267',   name:'Chase R5 · Charlotte'},
+  {n:33, short:'PHX2', track:'Phoenix 2',       date:'Oct 18', stages:'60-185-312',   name:'Chase R6 · Phoenix'},
+  {n:34, short:'TAL2', track:'Talladega 2',     date:'Oct 25', stages:'60-120-188',   name:'Chase R7 · Talladega'},
+  {n:35, short:'MV2',  track:'Martinsville 2',  date:'Nov 1',  stages:'130-260-500',  name:'Chase R8 · Martinsville'},
+  {n:36, short:'HOM',  track:'Homestead',       date:'Nov 8',  stages:'80-165-267',   name:'Chase R9 · Homestead — FINALE'},
 ];
 
 // ─────────────────────────────────────────
@@ -652,7 +652,7 @@ const FIELD_DRIVERS = [
 ];
 
 // Race numbers where qualifying was rained out (owner pts grid)
-const RAIN_QUAL = new Set([2, 10, 13, 14]); // Atlanta, Talladega, Charlotte, Nashville
+const RAIN_QUAL = new Set([2, 10, 13, 14, 21]); // Atlanta, Talladega, Charlotte, Nashville, N. Wilkesboro
 // ─────────────────────────────────────────
 const DEFAULT_DATA = {
   racesDone: 21,
