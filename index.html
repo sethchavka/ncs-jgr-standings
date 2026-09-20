@@ -363,6 +363,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
           <div class="panel-title" id="main-chart-title">Cumulative Points</div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <button id="proj-toggle" class="proj-btn" onclick="toggleProjections()">Proj Off</button>
+            <button id="playoff-view-toggle" class="proj-btn" onclick="togglePlayoffView()" style="display:none;">Playoff View</button>
             <div id="legend-points" class="legend"></div>
           </div>
         </div>
@@ -534,45 +535,45 @@ const RACES = [
 // ─────────────────────────────────────────
 const DRIVER_META = [
   {id:'hamlin', first:'Denny',       last:'Hamlin', car:'11', color:'#7B2FBE',
-   finish:[31,13,10,5,1,11,2,9,4,15,2,16,3,1,1,1,14,26,3,12,2,5,5,4,7,11,18,9],   starts:[22,29,19,11,2,9,1,11,2,3,4,20,11,1,1,1,26,9,1,28,7,5,29,14,4,30,4,10],
+   finish:[31,13,10,5,1,11,2,9,4,15,2,16,3,1,1,1,14,26,3,12,2,5,5,4,7,11,18,9,8],   starts:[22,29,19,11,2,9,1,11,2,3,4,20,11,1,1,1,26,9,1,28,7,5,29,14,4,30,4,10,3],
    wins:4, stageWins:5,
-   stagePtsPerRace:[7,0,0,15,14,0,20,13,19,0,8,0,26,6,3,12,0,0,11,2,16,12,5,13,2,0,16,5],
-   lapsLed:[4,11,0,5,134,2,292,0,113,28,21,0,75,58,40,28,0,0,30,0,9,33,0,3,0,0,179,0], bonusPts:[0,0,0,0,16,0,15,0,0,0,0,0,0,16,15,15,0,0,0,0,0,0,0,0,0,0,0,0],
-   arp:   [11.11,17.59,17.96,5.25,4.58,11.8,1.34,7.18,2.08,23.07,4.58,16.04,3.88,14.94,13.96,4.28,16.73,18.54,4.67,14.32,3.39,5.4,10.72,6.43,13.13,26.35,8.87,10.14],
-   arpS1: [12.29,25.35,15.65,6.15,1.95,11.41,1.08,11.62,1.10,21.72,3.57,23.05,7.74,31.87,28.22,1.87,24.5,8.0,6.35,23.83,5.03,4.27,22.9,9.9,24.68,28.85,2.07,13.15],
-   arpS2: [4.78,18.97,26.71,3.89,11.22,6.38,1.0,5.8,2.79,28.1,7.43,13.32,1.93,9.93,17.48,5.94,18.92,7.69,3.68,12.82,3.42,7.9,6.67,3.87,10.76,29.83,4.98,7.62],
-   arpS3: [14.88,9.7,14.61,6.1,1.15,16.78,1.58,5.39,2.34,22.38,3.47,14.16,2.64,4.63,1.98,4.11,11.82,29.9,4.13,8.0,2.69,4.24,8.38,7.26,9.38,17.53,20.72,11.35],
-   lapsT5:[38,47,2,128,177,56,342,159,245,40,169,0,236,62,56,95,2,2,182,16,338,113,121,193,0,0,171,16]},
+   stagePtsPerRace:[7,0,0,15,14,0,20,13,19,0,8,0,26,6,3,12,0,0,11,2,16,12,5,13,2,0,16,5,8],
+   lapsLed:[4,11,0,5,134,2,292,0,113,28,21,0,75,58,40,28,0,0,30,0,9,33,0,3,0,0,179,0,0], bonusPts:[0,0,0,0,16,0,15,0,0,0,0,0,0,16,15,15,0,0,0,0,0,0,0,0,0,0,0,0,0],
+   arp:   [11.11,17.59,17.96,5.25,4.58,11.8,1.34,7.18,2.08,23.07,4.58,16.04,3.88,14.94,13.96,4.28,16.73,18.54,4.67,14.32,3.39,5.4,10.72,6.43,13.13,26.35,8.87,10.14,9.77],
+   arpS1: [12.29,25.35,15.65,6.15,1.95,11.41,1.08,11.62,1.10,21.72,3.57,23.05,7.74,31.87,28.22,1.87,24.5,8.0,6.35,23.83,5.03,4.27,22.9,9.9,24.68,28.85,2.07,13.15,7.35],
+   arpS2: [4.78,18.97,26.71,3.89,11.22,6.38,1.0,5.8,2.79,28.1,7.43,13.32,1.93,9.93,17.48,5.94,18.92,7.69,3.68,12.82,3.42,7.9,6.67,3.87,10.76,29.83,4.98,7.62,12.95],
+   arpS3: [14.88,9.7,14.61,6.1,1.15,16.78,1.58,5.39,2.34,22.38,3.47,14.16,2.64,4.63,1.98,4.11,11.82,29.9,4.13,8.0,2.69,4.24,8.38,7.26,9.38,17.53,20.72,11.35,9.32],
+   lapsT5:[38,47,2,128,177,56,342,159,245,40,169,0,236,62,56,95,2,2,182,16,338,113,121,193,0,0,171,16,21]},
   {id:'briscoe', first:'Chase',      last:'Briscoe', car:'19', color:'#E87722',
-   finish:[36,2,37,null,8,12,14,5,3,29,23,4,null,3,10,12,17,2,1,36,3,4,6,2,26,13,6,null],  starts:[2,34,3,20,18,23,27,3,5,5,5,9,5,31,5,5,22,7,7,20,30,11,20,2,17,12,7,5],
+   finish:[36,2,37,null,8,12,14,5,3,29,23,4,null,3,10,12,17,2,1,36,3,4,6,2,26,13,6,null,null],  starts:[2,34,3,20,18,23,27,3,5,5,5,9,5,31,5,5,22,7,7,20,30,11,20,2,17,12,7,5,26],
    wins:1, stageWins:0,
-   stagePtsPerRace:[5,8,4,0,0,7,0,13,4,0,6,2,24,5,0,16,0,2,15,3,11,3,9,17,1,10,12,6],
-   lapsLed:[23,29,8,0,0,4,0,0,0,3,4,0,34,14,0,4,0,0,51,0,5,0,0,171,0,10,14,0],   bonusPts:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,0],
-   arp:   [22.54,11.8,6.42,9.07,20.09,9.06,20.6,5.91,8.34,24.73,13.89,8.46,3.81,8.52,17.86,9.15,16.7,4.18,3.98,16.92,7.3,15.43,8.97,1.98,11.88,8.49,6.49,12.68],
-   arpS1: [4.84,23.93,6.8,12.28,22.86,16.21,24.68,7.79,5.45,21.56,3.95,13.2,5.02,16.61,13.36,4.6,18.21,6.72,6.4,10.0,17.46,19.07,12.84,2.71,9.59,5.88,5.87,11.1],
-   arpS2: [29.95,6.0,7.95,4.96,24.61,6.81,23.12,2.84,8.32,31.63,18.32,8.95,2.82,4.97,23.43,7.45,13.64,3.88,3.78,21.96,6.84,21.0,7.39,1.65,12.35,6.06,4.77,14.64],
-   arpS3: [36.0,7.24,3.08,null,13.65,4.14,17.9,6.3,10.81,29.0,19.34,6.0,3.7,4.42,16.04,13.22,17.46,3.02,2.45,17.39,3.59,6.93,8.45,1.96,12.66,15.89,9.12,10.48],
-   lapsT5:[38,79,26,24,0,119,0,185,43,40,91,26,206,103,0,70,1,73,167,2,217,41,69,355,13,49,173,8]},
+   stagePtsPerRace:[5,8,4,0,0,7,0,13,4,0,6,2,24,5,0,16,0,2,15,3,11,3,9,17,1,10,12,6,0],
+   lapsLed:[23,29,8,0,0,4,0,0,0,3,4,0,34,14,0,4,0,0,51,0,5,0,0,171,0,10,14,0,0],   bonusPts:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,0,0],
+   arp:   [22.54,11.8,6.42,9.07,20.09,9.06,20.6,5.91,8.34,24.73,13.89,8.46,3.81,8.52,17.86,9.15,16.7,4.18,3.98,16.92,7.3,15.43,8.97,1.98,11.88,8.49,6.49,12.68,12.17],
+   arpS1: [4.84,23.93,6.8,12.28,22.86,16.21,24.68,7.79,5.45,21.56,3.95,13.2,5.02,16.61,13.36,4.6,18.21,6.72,6.4,10.0,17.46,19.07,12.84,2.71,9.59,5.88,5.87,11.1,16.99],
+   arpS2: [29.95,6.0,7.95,4.96,24.61,6.81,23.12,2.84,8.32,31.63,18.32,8.95,2.82,4.97,23.43,7.45,13.64,3.88,3.78,21.96,6.84,21.0,7.39,1.65,12.35,6.06,4.77,14.64,9.9],
+   arpS3: [36.0,7.24,3.08,null,13.65,4.14,17.9,6.3,10.81,29.0,19.34,6.0,3.7,4.42,16.04,13.22,17.46,3.02,2.45,17.39,3.59,6.93,8.45,1.96,12.66,15.89,9.12,10.48,10.68],
+   lapsT5:[38,79,26,24,0,119,0,185,43,40,91,26,206,103,0,70,1,73,167,2,217,41,69,355,13,49,173,8,0]},
   {id:'bell',    first:'Christopher',last:'Bell',    car:'20', color:'#C8102E',
-   finish:[null,21,3,2,4,19,7,27,20,17,null,21,2,2,null,26,null,5,2,2,19,2,2,7,4,17,1,19],   starts:[12,32,8,12,1,22,11,14,11,14,7,8,17,4,8,22,37,14,6,32,3,23,22,8,6,35,11,4],
+   finish:[null,21,3,2,4,19,7,27,20,17,null,21,2,2,null,26,null,5,2,2,19,2,2,7,4,17,1,19,4],   starts:[12,32,8,12,1,22,11,14,11,14,7,8,17,4,8,22,37,14,6,32,3,23,22,8,6,35,11,4,12],
    wins:1, stageWins:3,
-   stagePtsPerRace:[1,0,3,19,18,0,0,9,12,9,0,4,15,3,5,0,0,18,5,4,5,0,14,6,10,0,17,9],
-   lapsLed:[9,7,0,175,31,0,0,1,47,31,22,0,44,29,0,18,0,0,1,16,0,0,108,29,0,0,152,0],  bonusPts:[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,16,0],
-   arp:   [12.71,16.4,9.26,2.65,2.94,16.3,9.01,24.05,6.12,12.85,6.12,21.28,8.84,5.25,14.52,15.29,27.86,9.69,7.43,8.74,18.16,12.94,5.2,7.87,8.34,18.98,4.76,12.17],
-   arpS1: [14.19,24.7,11.3,6.18,3.1,17.62,13.12,4.83,10.71,15.04,6.12,7.7,15.49,3.24,27.26,21.5,29.47,7.69,5.38,18.02,3.73,20.25,11.67,7.81,2.82,20.5,6.0,6.83],
-   arpS2: [17.15,15.69,9.38,1.25,2.53,13.7,11.04,32.77,5.79,6.58,null,25.59,8.08,9.22,9.4,18.61,23.83,11.88,15.46,6.19,19.31,14.18,3.65,9.84,14.38,16.91,4.03,18.71],
-   arpS3: [7.52,10.07,8.2,1.37,3.16,17.27,6.51,30.63,2.45,12.43,null,25.4,4.71,3.51,2.0,8.83,null,9.58,3.67,3.74,23.06,4.69,3.47,6.03,4.69,19.89,4.36,6.85],
-   lapsT5:[45,23,29,186,233,0,6,70,167,36,27,1,64,134,27,26,0,21,146,93,50,36,183,95,123,0,241,57]},
+   stagePtsPerRace:[1,0,3,19,18,0,0,9,12,9,0,4,15,3,5,0,0,18,5,4,5,0,14,6,10,0,17,9,6],
+   lapsLed:[9,7,0,175,31,0,0,1,47,31,22,0,44,29,0,18,0,0,1,16,0,0,108,29,0,0,152,0,1],  bonusPts:[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,16,0,0],
+   arp:   [12.71,16.4,9.26,2.65,2.94,16.3,9.01,24.05,6.12,12.85,6.12,21.28,8.84,5.25,14.52,15.29,27.86,9.69,7.43,8.74,18.16,12.94,5.2,7.87,8.34,18.98,4.76,12.17,6.21],
+   arpS1: [14.19,24.7,11.3,6.18,3.1,17.62,13.12,4.83,10.71,15.04,6.12,7.7,15.49,3.24,27.26,21.5,29.47,7.69,5.38,18.02,3.73,20.25,11.67,7.81,2.82,20.5,6.0,6.83,12.85],
+   arpS2: [17.15,15.69,9.38,1.25,2.53,13.7,11.04,32.77,5.79,6.58,null,25.59,8.08,9.22,9.4,18.61,23.83,11.88,15.46,6.19,19.31,14.18,3.65,9.84,14.38,16.91,4.03,18.71,4.62],
+   arpS3: [7.52,10.07,8.2,1.37,3.16,17.27,6.51,30.63,2.45,12.43,null,25.4,4.71,3.51,2.0,8.83,null,9.58,3.67,3.74,23.06,4.69,3.47,6.03,4.69,19.89,4.36,6.85,3.36],
+   lapsT5:[45,23,29,186,233,0,6,70,167,36,27,1,64,134,27,26,0,21,146,93,50,36,183,95,123,0,241,57,281]},
   {id:'tgibbs',  first:'Ty',         last:'Gibbs',   car:'54', color:'#1D9E3E',
-   finish:[23,null,4,4,5,6,4,1,9,null,null,3,6,13,null,9,15,3,8,4,4,12,1,15,6,null,2,18],     starts:[20,25,9,14,3,28,4,5,3,9,10,10,2,6,4,4,11,1,5,23,2,4,4,4,7,14,28,9],
+   finish:[23,null,4,4,5,6,4,1,9,null,null,3,6,13,null,9,15,3,8,4,4,12,1,15,6,null,2,18,5],     starts:[20,25,9,14,3,28,4,5,3,9,10,10,2,6,4,4,11,1,5,23,2,4,4,4,7,14,28,9,13],
    wins:2, stageWins:3,
-   stagePtsPerRace:[0,0,10,3,7,2,16,4,10,0,7,8,21,0,9,8,7,20,9,5,10,18,14,0,7,9,1,2],
-   lapsLed:[0,0,5,12,0,1,0,25,0,17,1,17,7,1,6,0,0,31,0,0,47,30,20,1,0,0,0,0],   bonusPts:[0,0,0,0,0,0,0,15,0,0,0,0,1,0,0,0,0,0,0,0,0,0,15,0,0,0,0,0],
-   arp:   [17.86,19.84,10.88,6.9,8.73,10.97,3.38,7.66,7.00,13.69,8.88,4.84,4.32,10.35,16.77,10.5,15.02,6.14,7.98,11.56,11.99,10.13,7.35,17.13,7.29,16.54,10.72,13.37],
-   arpS1: [9.6,20.63,10.05,10.62,3.55,19.02,4.67,15.32,5.50,12.73,6.86,10.1,4.2,8.44,2.39,3.93,11.47,1.0,10.17,16.87,1.62,9.29,3.95,16.04,5.08,9.85,14.6,12.41],
-   arpS2: [19.93,16.15,8.81,6.85,15.3,9.55,2.01,8.97,7.97,19.31,21.33,4.27,3.43,13.74,19.27,15.63,22.94,10.62,7.82,11.99,22.35,11.78,13.58,19.12,8.85,27.3,12.93,16.08],
-   arpS3: [24.36,null,12.34,3.92,7.7,4.47,3.4,2.93,7.47,null,null,2.67,5.09,9.1,26.7,9.5,12.48,6.4,6.58,6.67,6.95,9.47,3.93,15.79,6.8,9.89,4.18,9.82],
-   lapsT5:[18,0,14,82,92,72,338,215,48,55,15,59,230,44,53,46,3,56,72,27,123,63,189,34,50,10,80,20]},
+   stagePtsPerRace:[0,0,10,3,7,2,16,4,10,0,7,8,21,0,9,8,7,20,9,5,10,18,14,0,7,9,1,2,15],
+   lapsLed:[0,0,5,12,0,1,0,25,0,17,1,17,7,1,6,0,0,31,0,0,47,30,20,1,0,0,0,0,120],   bonusPts:[0,0,0,0,0,0,0,15,0,0,0,0,1,0,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0],
+   arp:   [17.86,19.84,10.88,6.9,8.73,10.97,3.38,7.66,7.00,13.69,8.88,4.84,4.32,10.35,16.77,10.5,15.02,6.14,7.98,11.56,11.99,10.13,7.35,17.13,7.29,16.54,10.72,13.37,6.66],
+   arpS1: [9.6,20.63,10.05,10.62,3.55,19.02,4.67,15.32,5.50,12.73,6.86,10.1,4.2,8.44,2.39,3.93,11.47,1.0,10.17,16.87,1.62,9.29,3.95,16.04,5.08,9.85,14.6,12.41,13.66],
+   arpS2: [19.93,16.15,8.81,6.85,15.3,9.55,2.01,8.97,7.97,19.31,21.33,4.27,3.43,13.74,19.27,15.63,22.94,10.62,7.82,11.99,22.35,11.78,13.58,19.12,8.85,27.3,12.93,16.08,8.27],
+   arpS3: [24.36,null,12.34,3.92,7.7,4.47,3.4,2.93,7.47,null,null,2.67,5.09,9.1,26.7,9.5,12.48,6.4,6.58,6.67,6.95,9.47,3.93,15.79,6.8,9.89,4.18,9.82,1.79],
+   lapsT5:[18,0,14,82,92,72,338,215,48,55,15,59,230,44,53,46,3,56,72,27,123,63,189,34,50,10,80,20,236]},
 ];
 
 
@@ -655,43 +656,44 @@ const FIELD_DRIVERS = [
 const RAIN_QUAL = new Set([2, 10, 13, 14, 21]); // Atlanta, Talladega, Charlotte, Nashville, N. Wilkesboro
 // ─────────────────────────────────────────
 const DEFAULT_DATA = {
-  racesDone: 28,
-  lastRace: 'Gateway · Sep 13',
-  leaderName: 'Hamlin',
-  leaderPts: 2168,
-  updatedAt: 'Sep 13, 2026',
+  racesDone: 29,
+  lastRace: 'Bristol 2 · Sep 19',
+  leaderName: 'Larson',
+  leaderPts: 2206,
+  updatedAt: 'Sep 19, 2026',
+  playoffReset: {hamlin:2100, briscoe:2055, bell:2050, tgibbs:2060}, // official post-reset pts at R26
   cutlineByRace: [39,45,45,47,76,139,167,177,210,226,242,283,303,306,332,355,367,401,411,446,495,518,526,567,586,2000],
   drivers: {
-    hamlin:  {pts:[8,32,60,107,177,203,259,300,352,374,417,438,498,560,618,685,708,719,764,791,842,886,923,969,1001,1027,2135,2168], rank:[33,27,23,12,4,4,3,3,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1]},
-    briscoe: {pts:[2,45,46,47,76,108,131,176,214,222,242,277,304,343,370,411,431,468,538,542,587,623,663,715,727,761,2098,2109], rank:[37,16,27,27,20,22,21,17,15,17,16,17,15,14,13,12,10,11,8,10,8,7,5,5,6,5,5,8]},
-    bell:    {pts:[9,25,59,113,164,182,212,231,261,290,291,311,361,399,410,421,422,472,512,551,574,609,659,695,738,758,2123,2150], rank:[31,31,24,6,6,8,7,9,10,9,13,11,8,7,10,10,12,10,10,9,10,10,6,7,5,6,2,3]},
-    tgibbs:  {pts:[16,17,65,101,140,173,222,281,319,322,330,372,425,449,470,506,535,589,627,665,708,751,820,842,880,892,2096], rank:[26,33,17,15,10,11,6,4,4,5,7,6,4,5,5,5,5,4,4,4,4,4,2,3,3,4,6]},
+    hamlin:  {pts:[8,32,60,107,177,203,259,300,352,374,417,438,498,560,618,685,708,719,764,791,842,886,923,969,1001,1027,2135,2168,2205], rank:[33,27,23,12,4,4,3,3,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,2]},
+    briscoe: {pts:[2,45,46,47,76,108,131,176,214,222,242,277,304,343,370,411,431,468,538,542,587,623,663,715,727,761,2098,2109,2119], rank:[37,16,27,27,20,22,21,17,15,17,16,17,15,14,13,12,10,11,8,10,8,7,5,5,6,5,5,8,9]},
+    bell:    {pts:[9,25,59,113,164,182,212,231,261,290,291,311,361,399,410,421,422,472,512,551,574,609,659,695,738,758,2123,2150,2189], rank:[31,31,24,6,6,8,7,9,10,9,13,11,8,7,10,10,12,10,10,9,10,10,6,7,5,6,2,3,4]},
+    tgibbs:  {pts:[16,17,65,101,140,173,222,281,319,322,330,372,425,449,470,506,535,589,627,665,708,751,820,842,880,892,2096,2117,2164], rank:[26,33,17,15,10,11,6,4,4,5,7,6,4,5,5,5,5,4,4,4,4,4,2,3,3,4,6,5,5]},
   },
   standings: [
-    {pos:1,  name:'Denny Hamlin',       car:'11', team:'JGR',      pts:2168, wins:4, jgr:true,  dId:'hamlin'},
-    {pos:2,  name:'Kyle Larson',       car:'5', team:'HMS',      pts:2159, wins:0, jgr:false},
-    {pos:3,  name:'Christopher Bell',       car:'20', team:'JGR',      pts:2150, wins:1, jgr:true,  dId:'bell'},
-    {pos:4,  name:'Ryan Blaney',       car:'12', team:'Penske',      pts:2135, wins:2, jgr:false},
-    {pos:5,  name:'Tyler Reddick',       car:'45', team:'23XI',      pts:2126, wins:5, jgr:false},
-    {pos:6,  name:'Ty Gibbs',       car:'54', team:'JGR',      pts:2117, wins:2, jgr:true,  dId:'tgibbs'},
-    {pos:7,  name:'Joey Logano',       car:'22', team:'Penske',      pts:2117, wins:2, jgr:false},
-    {pos:8,  name:'Chase Briscoe',       car:'19', team:'JGR',      pts:2109, wins:1, jgr:true,  dId:'briscoe'},
-    {pos:9,  name:'Carson Hocevar',       car:'77', team:'Spire',      pts:2080, wins:1, jgr:false},
-    {pos:10,  name:'Bubba Wallace',       car:'23', team:'23XI',      pts:2078, wins:0, jgr:false},
-    {pos:11,  name:'Chase Elliott',       car:'9', team:'HMS',      pts:2075, wins:2, jgr:false},
-    {pos:12,  name:'Austin Cindric',       car:'2', team:'Penske',      pts:2060, wins:0, jgr:false},
-    {pos:13,  name:'Chris Buescher',       car:'17', team:'RFK',      pts:2057, wins:0, jgr:false},
-    {pos:14,  name:'Ryan Preece',       car:'60', team:'HFT',      pts:2055, wins:0, jgr:false},
-    {pos:15,  name:'William Byron',       car:'24', team:'HMS',      pts:2054, wins:0, jgr:false},
-    {pos:16,  name:'Daniel Suarez',       car:'7', team:'TCH',      pts:2049, wins:1, jgr:false},
-    {pos:17,  name:'S. Van Gisbergen',       car:'97', team:'Spire',      pts:605, wins:2, jgr:false},
-    {pos:18,  name:'Brad Keselowski',       car:'6', team:'RFK',      pts:543, wins:0, jgr:false},
-    {pos:19,  name:'Ross Chastain',       car:'1', team:'TCH',      pts:518, wins:0, jgr:false},
-    {pos:20,  name:'M. McDowell',       car:'71', team:'FRM',      pts:517, wins:0, jgr:false},
-    {pos:21,  name:'Erik Jones',       car:'43', team:'Legacy',      pts:498, wins:0, jgr:false},
-    {pos:22,  name:'Todd Gilliland',       car:'34', team:'HFT',      pts:468, wins:0, jgr:false},
+    {pos:1,  name:'Kyle Larson',       car:'5', team:'HMS',      pts:2206, wins:1, jgr:false},
+    {pos:2,  name:'Denny Hamlin',       car:'11', team:'JGR',      pts:2205, wins:4, jgr:true,  dId:'hamlin'},
+    {pos:3,  name:'Joey Logano',       car:'22', team:'Penske',      pts:2190, wins:3, jgr:false},
+    {pos:4,  name:'Christopher Bell',       car:'20', team:'JGR',      pts:2189, wins:1, jgr:true,  dId:'bell'},
+    {pos:5,  name:'Ty Gibbs',       car:'54', team:'JGR',      pts:2164, wins:2, jgr:true,  dId:'tgibbs'},
+    {pos:6,  name:'Ryan Blaney',       car:'12', team:'Penske',      pts:2154, wins:3, jgr:false},
+    {pos:7,  name:'Tyler Reddick',       car:'45', team:'23XI',      pts:2145, wins:5, jgr:false},
+    {pos:8,  name:'Carson Hocevar',       car:'77', team:'Spire',      pts:2121, wins:1, jgr:false},
+    {pos:9,  name:'Chase Briscoe',       car:'19', team:'JGR',      pts:2119, wins:1, jgr:true,  dId:'briscoe'},
+    {pos:10,  name:'Bubba Wallace',       car:'23', team:'23XI',      pts:2114, wins:0, jgr:false},
+    {pos:11,  name:'Austin Cindric',       car:'2', team:'Penske',      pts:2090, wins:0, jgr:false},
+    {pos:12,  name:'Chase Elliott',       car:'9', team:'HMS',      pts:2089, wins:2, jgr:false},
+    {pos:13,  name:'William Byron',       car:'24', team:'HMS',      pts:2085, wins:0, jgr:false},
+    {pos:14,  name:'Ryan Preece',       car:'60', team:'HFT',      pts:2082, wins:1, jgr:false},
+    {pos:15,  name:'Chris Buescher',       car:'17', team:'RFK',      pts:2082, wins:0, jgr:false},
+    {pos:16,  name:'Daniel Suarez',       car:'7', team:'TCH',      pts:2072, wins:1, jgr:false},
+    {pos:17,  name:'S. Van Gisbergen',       car:'97', team:'Spire',      pts:647, wins:2, jgr:false},
+    {pos:18,  name:'Brad Keselowski',       car:'6', team:'RFK',      pts:615, wins:0, jgr:false},
+    {pos:19,  name:'Ross Chastain',       car:'1', team:'TCH',      pts:592, wins:0, jgr:false},
+    {pos:20,  name:'M. McDowell',       car:'71', team:'FRM',      pts:570, wins:0, jgr:false},
+    {pos:21,  name:'Erik Jones',       car:'43', team:'Legacy',      pts:549, wins:0, jgr:false},
+    {pos:22,  name:'Todd Gilliland',       car:'34', team:'HFT',      pts:520, wins:0, jgr:false},
     {pos:23, name:'Ricky Stenhouse Jr.',car:'47', team:'JTG',      pts:271, wins:0, jgr:false},
-    {pos:24,  name:'Zane Smith',       car:'38', team:'FRM',      pts:455, wins:0, jgr:false},
+    {pos:24,  name:'Josh Berry',       car:'21', team:'MCR',      pts:501, wins:0, jgr:false},
   ],
 };
 
@@ -700,7 +702,7 @@ const DEFAULT_DATA = {
 // ─────────────────────────────────────────
 let DATA = null, DRIVERS = [];
 let chartPts = null, chartStandings = null, expandChart = null, cmpChart = null;
-let expandedId = null, showProjections = false, isLight = false;
+let expandedId = null, showProjections = false, isLight = false, playoffViewOnly = false;
 
 // ─────────────────────────────────────────
 // INIT
@@ -751,7 +753,7 @@ const avgARP_S2 = d => arrAvg(d.arpS2||[]);
 const avgARP_S3 = d => arrAvg(d.arpS3||[]);
 
 // Green flag laps per race (from XML timing files — used for % calculations)
-const GREEN_LAPS = [165,201,83,218,245,264,343,429,252,155,223,86,293,217,141,134,60,100,221,209,402,131,301,367,242,143,319,149];
+const GREEN_LAPS = [165,201,83,218,245,264,343,429,252,155,223,86,293,217,141,134,60,100,221,209,402,131,301,367,242,143,319,149,416];
 const totalGreenLaps = () => GREEN_LAPS.slice(0, DATA.racesDone).reduce((a,b)=>a+b,0);
 const lapsT5Total   = d => (d.lapsT5||[]).reduce((a,b)=>a+(b||0),0);
 const pctLapsLed = d => { const t=totalGreenLaps(); return t ? (lapsLedTotal(d)/t*100).toFixed(1)+'%' : '—'; };
@@ -1287,9 +1289,16 @@ function buildMainChart() {
 
   document.getElementById('main-chart-title').textContent = meta.label;
 
-  const labels = extendToCutoff
-    ? RACES.slice(0,cutoff).map(r=>r.short)
-    : RACES.slice(0,rd).map(r=>r.short);
+  const isPlayoff = key==='pts' && DATA.racesDone > 25;
+  const usePlayoffView = playoffViewOnly && isPlayoff && key==='pts';
+
+  // In playoff view: x-axis = Reset + all playoff races (R27-R36)
+  const playoffRaces = RACES.slice(26, 36); // R27–R36 full playoff schedule
+  const labels = usePlayoffView
+    ? ['Reset', ...playoffRaces.map(r=>r.short)]
+    : extendToCutoff
+      ? RACES.slice(0,cutoff).map(r=>r.short)
+      : RACES.slice(0,rd).map(r=>r.short);
 
   // Legend
   let legHtml = DRIVERS.map(d=>`<div class="leg-item"><div class="leg-dot" style="background:${d.color};"></div>#${d.car} ${d.last}</div>`).join('');
@@ -1297,15 +1306,25 @@ function buildMainChart() {
   document.getElementById('legend-points').innerHTML = legHtml;
 
   const datasets = [];
+
   DRIVERS.forEach(d=>{
+    let data;
+    if(usePlayoffView){
+      const resetPt = (DATA.playoffReset||{})[d.id] ?? null;
+      const playoffData = d.pts.slice(26, rd).map(v=>v??null);
+      const remaining = Array(10 - playoffData.length).fill(null); // pad to 10 playoff races
+      data = [resetPt, ...playoffData, ...remaining];
+    } else {
+      data = getMainData(d,key,rd,cutoff);
+    }
     datasets.push({
-      label:`#${d.car} ${d.last}`, data:getMainData(d,key,rd,cutoff),
+      label:`#${d.car} ${d.last}`, data,
       borderColor:d.color, backgroundColor:d.color+'15',
       borderWidth:2.5, pointRadius:3, pointHoverRadius:5,
       tension:0.35, fill:false, spanGaps:false,
     });
   });
-  if(key==='pts') {
+  if(key==='pts' && !usePlayoffView) {
     DRIVERS.forEach(d=>{
       const lastPts=lPts(d), n=nRaced(d);
       if(!n||!lastPts){datasets.push({label:`#${d.car} proj`,data:Array(cutoff).fill(null),hidden:true,borderColor:d.color});return;}
@@ -1321,17 +1340,20 @@ function buildMainChart() {
   const allVals=datasets.flatMap(ds=>ds.data||[]).filter(v=>v!=null);
   const maxVal=allVals.length?Math.max(...allVals):40;
   const isPct = ['pctLapsLed','pctLapsT5'].includes(key);
-  const isPlayoff = key==='pts' && DATA.racesDone > 25;
+  const pvBtn = document.getElementById('playoff-view-toggle');
+  if(pvBtn) pvBtn.style.display = (isPlayoff && key==='pts') ? '' : 'none';
 
   const goldTick = 'rgba(240,208,0,0.7)';
 
-  // Split datasets across axes in playoff era
-  if(isPlayoff){
+  // Split datasets across axes in playoff era (full view only)
+  if(isPlayoff && !usePlayoffView){
     const originals = datasets.slice();
     datasets.length = 0;
     originals.forEach(ds=>{
       if(!ds.data){ datasets.push(ds); return; }
-      datasets.push({...ds, data:ds.data.map(v=>(v!=null&&v<2000)?v:null), yAxisID:'y'});
+      if(!playoffViewOnly){
+        datasets.push({...ds, data:ds.data.map(v=>(v!=null&&v<2000)?v:null), yAxisID:'y'});
+      }
       datasets.push({...ds, data:ds.data.map(v=>(v!=null&&v>=2000)?v:null), yAxisID:'y2',
         label:ds.label+'\u200b', borderDash:ds.borderDash||[], pointRadius:ds.pointRadius??3});
     });
@@ -1357,22 +1379,34 @@ function buildMainChart() {
     y:yOpts,
   };
   if(isPlayoff){
-    // Left axis:  0 → preMax (regular season range)
-    // Right axis: 1000 → 1000+preMax (same pixel span, offset +1000)
-    // So left:1000 = right:2000 at the same pixel position ✓
-    // Playoff data is raw (2100+) and falls within 1000→1000+preMax
-    const playMax = playVals.length ? Math.max(...playVals) : 2200;
+    const playVals2 = usePlayoffView
+      ? datasets.flatMap(ds=>ds.data||[]).filter(v=>v!=null&&v>=2000)
+      : datasets.filter(ds=>ds.yAxisID==='y2'&&!ds.borderDash?.length).flatMap(ds=>ds.data||[]).filter(v=>v!=null);
+    const playMax = playVals2.length ? Math.max(...playVals2) : 2200;
+    const playMin = playVals2.length ? Math.min(...playVals2) : 2000;
     const span    = playMax <= 2200 ? 1200 : Math.ceil((playMax - 1000 + 50) / 100) * 100;
-    scales.y.min  = 0;
-    scales.y.max  = span;
-    scales.y2 = {
-      position:'right',
-      min: 1000,
-      max: 1000 + span,
-      grid:{drawOnChartArea:false},
-      ticks:{color:goldTick, font:{size:11}},
-      title:{display:true, text:'Playoff Pts', color:goldTick, font:{size:11}},
-    };
+
+    if(usePlayoffView){
+      // Single left axis: seed pts (700-1100) + playoff pts (2000+) on same scale
+      // Just show the actual values — the seeding pts visually separate from playoff pts
+      const allData = datasets.flatMap(ds=>ds.data||[]).filter(v=>v!=null);
+      const allMin  = allData.length ? Math.min(...allData) : 700;
+      const allMax  = allData.length ? Math.max(...allData) : 2200;
+      const pad     = Math.max(20, Math.ceil((allMax - allMin) * 0.04));
+      scales.y.min  = allMin - pad;
+      scales.y.max  = allMax + pad;
+    } else {
+      scales.y.min  = 0;
+      scales.y.max  = span;
+      scales.y2 = {
+        position:'right',
+        min: 1000,
+        max: 1000 + span,
+        grid:{drawOnChartArea:false},
+        ticks:{color:goldTick, font:{size:11}},
+        title:{display:true, text:'Playoff Pts', color:goldTick, font:{size:11}},
+      };
+    }
   }
 
   chartPts=new Chart(document.getElementById('chart-points').getContext('2d'),{
@@ -1405,6 +1439,13 @@ function buildMainChart() {
   }
 }
 
+function togglePlayoffView() {
+  playoffViewOnly = !playoffViewOnly;
+  const btn = document.getElementById('playoff-view-toggle');
+  if(btn) btn.textContent = playoffViewOnly ? 'Full Season' : 'Playoff View';
+  buildMainChart();
+}
+
 function toggleProjections() {
   showProjections=!showProjections;
   const btn=document.getElementById('proj-toggle');
@@ -1431,13 +1472,13 @@ function rebuildCharts() {
   const tt={backgroundColor:isLight?'#F7F8FB':'#0D0F14',borderColor:isLight?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.08)',borderWidth:1,titleColor:isLight?'#0C0D14':'#F4F5F8',bodyColor:isLight?'#444C60':'#8892A4',padding:10,cornerRadius:0,displayColors:false};
   const gc=isLight?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.06)', tc=isLight?'#9099AE':'#6E7280';
 
-  const standings=DATA.standings||[];
+  const isPlayoffStandings = DATA.racesDone > 26;
+  const standings=(DATA.standings||[]).slice(0, isPlayoffStandings ? 16 : 24);
   const p16pts=standings[15]?.pts||0;
   const barColors=standings.map(s=>{if(!s.jgr)return'rgba(255,255,255,0.1)';const d=DRIVERS.find(dr=>dr.id===s.dId);return d?d.color:'var(--red)';});
   const barBorders=standings.map(s=>{if(!s.jgr)return'rgba(255,255,255,0.15)';const d=DRIVERS.find(dr=>dr.id===s.dId);return d?d.color:'var(--red)';});
-  const isPlayoffStandings = DATA.racesDone > 26;
   const standingsPts = standings.map(s => s.pts);
-  const standingsMax = Math.max(...standingsPts.filter(v=>v!=null));
+  const standingsMax = standingsPts.length ? Math.max(...standingsPts.filter(v=>v!=null)) : 2200;
   const yMin = isPlayoffStandings ? 2000 : 0;
 
   chartStandings=new Chart(document.getElementById('chart-standings').getContext('2d'),{
