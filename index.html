@@ -474,7 +474,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
       <div class="panel">
         <div class="panel-hdr"><div class="panel-title">Season Snapshot</div><div class="panel-note">Selected drivers only</div></div>
         <div class="panel-body" style="padding:0;overflow-x:auto;">
-          <table class="mt"><thead><tr><th>Driver</th><th>Pos</th><th>Points</th><th>vs Cutline</th><th>Wins</th><th>Top 5</th><th>Top 10</th><th>Avg Finish</th></tr></thead>
+          <table class="mt"><thead><tr><th>Driver</th><th>Pos</th><th>Points</th><th id="cmp-delta-hdr">vs Cutline</th><th>Wins</th><th>Top 5</th><th>Top 10</th><th>Avg Finish</th></tr></thead>
           <tbody id="cmp-table-body"></tbody></table>
         </div>
       </div>
@@ -623,32 +623,32 @@ const QUAL_FIELD = [
   {car:'3',  driver:'Austin Dillon',          lastFin:37, ownerRank:25, jgr:false},
 ];
 
-// Field driver race-by-race data (R1-R15) — sourced from official NASCAR PDFs
+// Field driver race-by-race data (R1-R33) — sourced from official NASCAR PDFs
 const FIELD_DRIVERS = [
-  {car:'45',first:'Tyler',last:'Reddick',color:'#3B82F6',pts:[58, 125, 186, 225, 255, 325, 353, 386, 457, 484, 526, 567, 620, 657, 669,704,716,718,720,767,774,802,803,831,860,894],finish:[1, 1, 1, 8, 13, 1, 15, 4, 1, 14, 4, 5, 4, 6, 35,2,25,25,25,8,30,30,8,9,5,null]},
-  {car:'12',first:'Ryan',last:'Blaney',color:'#8B5CF6',pts:[36, 67, 100, 165, 188, 230, 271, 324, 337, 344, 371, 405, 446, 483, 512,539,583,615,651,726,755,766,813,854,924,938],finish:[27, 10, 8, 1, 16, 3, 6, 2, 24, 37, 10, 11, 7, 8, 8,10,9,9,9,1,11,3,3,1,null,null]},
-  {car:'9',first:'Chase',last:'Elliott',color:'#F97316',pts:[43, 81, 114, 128, 168, 194, 249, 264, 305, 340, 409, 422, 423, 460, 482,509,534,554,584,610,634,635,657,695,707,723],finish:[4, 11, 7, 23, 2, 15, 1, 22, 8, 4, 1, 24, 37, 7, 32,11,12,12,12,22,17,17,4,6,2,null]},
-  {car:'5',first:'Kyle',last:'Larson',color:'#06B6D4',pts:[29, 42, 73, 109, 157, 176, 206, 260, 314, 315, 318, 332, 386, 409, 453,494,536,571,583,594,616,617,629,660,708,724],finish:[16, 32, 6, 3, 7, 32, 9, 3, 2, 40, 34, 23, 5, 23, 4,5,3,3,5,3,15,8,10,8,3,null]},
-  {car:'77',first:'Carson',last:'Hocevar',color:'#84CC16',pts:[36, 74, 82, 103, 118, 151, 171, 209, 237, 292, 333, 342, 356, 383, 428,449,476,509,524,563,598,638,644,645,672,673],finish:[18, 4, 31, 20, 22, 4, 17, 10, 13, 1, 7, 28, 23, 10, 5,20,19,19,19,10,13,1,14,11,8,null]},
-  {car:'17',first:'Chris',last:'Buescher',color:'#EC4899',pts:[39, 61, 81, 111, 146, 188, 206, 230, 259, 309, 345, 375, 385, 393, 424,461,500,518,541,568,585,613,637,653,676,677],finish:[7, 15, 24, 14, 6, 9, 19, 13, 10, 2, 5, 12, 30, 29, 9,7,6,6,6,7,20,20,9,10,9,null]},
-  {car:'7',first:'Daniel',last:'Suarez',color:'#F59E0B',pts:[35, 67, 87, 98, 117, 150, 167, 192, 210, 235, 271, 295, 336, 378, 418,450,478,484,507,529,558,583,597,618,638,676],finish:[13, 5, 25, 30, 18, 7, 20, 12, 19, 12, 6, 13, 1, 19, 6,13,13,13,13,5,9,9,12,13,13,null]},
-  {car:'23',first:'Bubba',last:'Wallace',color:'#14B8A6',pts:[37, 85, 116, 153, 194, 205, 206, 236, 275, 276, 304, 313, 328, 338, 378,394,429,444,484,493,531,540,565,587,630,651],finish:[10, 8, 11, 6, 9, 34, 36, 11, 5, 36, 9, 29, 22, 32, 3,21,2,2,2,13,6,6,11,14,11,null]},
-  {car:'24',first:'William',last:'Byron',color:'#A78BFA',pts:[25, 50, 76, 108, 157, 191, 238, 245, 275, 277, 308, 309, 337, 352, 377,415,421,446,499,520,546,568,600,630,644,666],finish:[12, 28, 13, 7, 3, 8, 5, 30, 7, 35, 8, 36, 9, 30, 18,3,32,32,4,14,12,12,7,12,4,null]},
-  {car:'97',first:'Shane Van',last:'Gisbergen',color:'#FB923C',pts:[13, 45, 90, 116, 117, 140, 174, 177, 178, 195, 215, 283, 316, 348, 355,361,362,425,437,469,516,537,544,567,586,605],finish:[30, 6, 2, 11, 36, 14, 11, 34, 36, 20, 17, 1, 11, 5, 30,31,38,1,14,16,5,5,15,16,16,null]},
-  {car:'6',first:'Brad',last:'Keselowski',color:'#6366F1',pts:[39, 61, 78, 100, 127, 182, 206, 229, 264, 279, 311, 318, 343, 347, 350,351,354,376,392,403,437,468,478,489,520,543],finish:[5, 17, 20, 15, 10, 2, 13, 14, 6, 31, 13, 30, 15, 34, 34,38,34,34,34,18,7,7,19,19,18,null]},
-  {car:'2',first:'Austin',last:'Cindric',color:'#78716C',pts:[13, 34, 39, 52, 71, 109, 149, 172, 197, 226, 248, 287, 288, 306, 332,355,370,401,434,470,495,518,526,574,599,631],finish:[34, 26, 32, 34, 19, 5, 8, 16, 12, 8, 15, 9, 38, 26, 11,14,22,22,22,9,14,14,13,15,15,null]},
-  {car:'22',first:'Joey',last:'Logano',color:'#0EA5E9',pts:[46, 68, 90, 113, 135, 139, 185, 218, 225, 234, 235, 245, 274, 297, 329,334,357,370,395,438,511,545,586,659,682,709],finish:[3, 18, 15, 31, 15, 33, 3, 7, 30, 39, 37, 38, 8, 14, 7,34,18,18,18,17,1,13,16,3,10,null]},
-  {car:'43',first:'Erik',last:'Jones',color:'#10B981',pts:[16, 29, 32, 59, 76, 103, 119, 133, 147, 161, 196, 214, 244, 270, 314,355,372,389,411,446,462,474,476,486,490,498],finish:[21, 24, 34, 10, 20, 10, 21, 23, 23, 23, 12, 19, 13, 11, 2,6,20,20,20,6,21,21,20,20,20,null]},
-  {car:'60',first:'Ryan',last:'Preece',color:'#EF4444',pts:[17, 49, 68, 92, 125, 154, 180, 209, 235, 269, 298, 296, 303, 304, 313,322,367,402,407,420,447,480,497,517,555,622],finish:[25, 9, 18, 13, 11, 13, 12, 8, 11, 18, 14, 14, 33, 36, 28,28,11,11,11,28,10,10,17,17,12,null]},
-  {car:'71',first:'Michael',last:'McDowell',color:'#D946EF',pts:[26, 43, 83, 111, 122, 139, 158, 171, 174, 179, 189, 225, 248, 275, 286,306,333,369,377,399,412,442,454,463,484,517],finish:[22, 20, 5, 9, 26, 20, 18, 24, 34, 32, 27, 2, 14, 15, 26,17,10,10,10,27,24,24,21,21,21,null]},
-  {car:'16',first:'AJ',last:'Allmendinger',color:'#64748B',pts:[18, 43, 86, 104, 117, 124, 134, 156, 162, 183, 199, 235, 254, 266, 286,301,346,375,395,396,397,409,438,442,456,463],finish:[19, 12, 9, 19, 24, 30, 27, 15, 31, 16, 25, 7, 18, 35, 17,22,5,5,5,21,37,37,22,22,22,null]},
-  {car:'38',first:'Zane',last:'Smith',color:'#B45309',pts:[41, 71, 75, 85, 108, 123, 126, 144, 149, 183, 198, 217, 244, 272, 282,283,316,340,349,356,371,393,417,418,442,455],finish:[6, 7, 33, 27, 14, 22, 34, 19, 32, 5, 22, 18, 10, 9, 33,37,4,4,23,24,22,22,24,24,24,null]},
-  {car:'47',first:'Ricky Stenhouse',last:'Jr.',color:'#DC2626',pts:[39, 40, 49, 64, 72, 80, 87, 107, 123, 161, 187, 193, 222, 263, 271,299,303,319,347,347,347],finish:[2, 36, 28, 22, 29, 29, 30, 17, 21, 6, 19, 31, 12, 4, 29,15,33,33,15,null,34,null,null]},
-  {car:'1',first:'Ross',last:'Chastain',color:'#7C3AED',pts:[17, 51, 64, 74, 94, 115, 136, 153, 164, 205, 216, 236, 238, 239, 260,294,327,356,375,401,412,436,479,504,505,518],finish:[20, 3, 35, 28, 17, 16, 16, 20, 26, 7, 26, 27, 35, 37, 16,8,7,7,7,19,27,27,18,18,19,null]},
-  {car:'34',first:'Todd',last:'Gilliland',color:'#0891B2',pts:[16, 16, 39, 65, 68, 82, 96, 127, 147, 181, 186, 206, 223, 240, 255,283,306,306,353,384,406,421,428,444,468],finish:[39, 25, 21, 12, 34, 23, 23, 6, 17, 11, 32, 17, 20, 20, 22,19,21,21,21,25,8,8,null,23,23,null]},
-  {car:'35',first:'Riley',last:'Herbst',color:'#16A34A',pts:[35, 39, 53, 72, 86, 88, 90, 109, 132, 144, 173, 186, 202, 224, 250,271,309,309,348,369,369,369,369,369,369],finish:[8, 33, 23, 18, 23, 35, 35, 21, 14, 25, 11, 26, 21, 17, 13,16,8,8,8,null,18,18,null,null,null,null]},
-  {car:'3',first:'Austin',last:'Dillon',color:'#9333EA',pts:[17, 17, 35, 56, 81, 93, 105, 124, 145, 163, 182, 220, 225, 244, 245,257,270,270,341,341,341,341,341,341],finish:[37, 29, 19, 16, 12, 25, 25, 18, 16, 19, 18, 6, 32, 18, 36,25,24,24,24,null,23,23,23,null,null,null]},
-  {car:'42',first:'John Hunter',last:'Nemechek',color:'#C2410C',pts:[25, 43, 63, 75, 91, 101, 109, 111, 126, 141, 157, 189, 201, 213, 236,277,298,298,350,350,350,350,350,350],finish:[26, 19, 17, 25, 21, 27, 29, 35, 22, 22, 21, 10, 26, 24, 14,4,16,16,16,null,31,31,null,null,null,null]},
+  {car:'45',first:'Tyler',last:'Reddick',color:'#3B82F6',pts:[58,125,186,225,255,325,353,386,457,484,526,567,620,657,669,704,716,718,720,767,774,802,803,831,860,894,2111,2126,2145,2171,2212,2253,2314],finish:[1,1,1,8,13,1,15,4,1,14,4,5,4,6,35,2,25,25,25,8,30,30,8,9,5,null,3,25,18,11,3,8,1]},
+  {car:'12',first:'Ryan',last:'Blaney',color:'#8B5CF6',pts:[36,67,100,165,188,230,271,324,337,344,371,405,446,483,512,539,583,615,651,726,755,766,813,854,924,938,2119,2135,2154,2191,2238,2282,2330],finish:[27,10,8,1,16,3,6,2,24,37,10,11,7,8,8,10,9,9,9,1,11,3,3,1,null,null,4,35,33,5,5,3,2]},
+  {car:'9',first:'Chase',last:'Elliott',color:'#F97316',pts:[43,81,114,128,168,194,249,264,305,340,409,422,423,460,482,509,534,554,584,610,634,635,657,695,707,723,2063,2075,2089,2121,2155,2182,2221],finish:[4,11,7,23,2,15,1,22,8,4,1,24,37,7,32,11,12,12,12,22,17,17,4,6,2,null,14,31,23,8,7,12,3]},
+  {car:'5',first:'Kyle',last:'Larson',color:'#06B6D4',pts:[29,42,73,109,157,176,206,260,314,315,318,332,386,409,453,494,536,571,583,594,616,617,629,660,708,724,2086,2159,2206,2282,2318,2367,2370],finish:[16,32,6,3,7,32,9,3,2,40,34,23,5,23,4,5,3,3,5,3,15,8,10,8,3,null,5,1,2,1,2,6,34]},
+  {car:'77',first:'Carson',last:'Hocevar',color:'#84CC16',pts:[36,74,82,103,118,151,171,209,237,292,333,342,356,383,428,449,476,509,524,563,598,638,644,645,672,673,2046,2080,2121,2132,2160,2187,2212],finish:[18,4,31,20,22,4,17,10,13,1,7,28,23,10,5,20,19,19,19,10,13,1,14,11,8,null,11,8,3,33,12,14,12]},
+  {car:'17',first:'Chris',last:'Buescher',color:'#EC4899',pts:[39,61,81,111,146,188,206,230,259,309,345,375,385,393,424,461,500,518,541,568,585,613,637,653,676,677,2047,2057,2082,2096,2122,2151,2166],finish:[7,15,24,14,6,9,19,13,10,2,5,12,30,29,9,7,6,6,6,7,20,20,9,10,9,null,20,27,13,23,13,10,22]},
+  {car:'7',first:'Daniel',last:'Suarez',color:'#F59E0B',pts:[35,67,87,98,117,150,167,192,210,235,271,295,336,378,418,450,478,484,507,529,558,583,597,618,638,676,2041,2049,2072,2095,2123,2152,2182],finish:[13,5,25,30,18,7,20,12,19,12,6,13,1,19,6,13,13,13,13,5,9,9,12,13,13,null,21,29,14,14,14,13,7]},
+  {car:'23',first:'Bubba',last:'Wallace',color:'#14B8A6',pts:[37,85,116,153,194,205,206,236,275,276,304,313,328,338,378,394,429,444,484,493,531,540,565,587,630,651,2054,2078,2114,2142,2181,2182,2208],finish:[10,8,11,6,9,34,36,11,5,36,9,29,22,32,3,21,2,2,2,13,6,6,11,14,11,null,8,14,7,9,8,37,17]},
+  {car:'24',first:'William',last:'Byron',color:'#A78BFA',pts:[25,50,76,108,157,191,238,245,275,277,308,309,337,352,377,415,421,446,499,520,546,568,600,630,644,666,2021,2054,2085,2124,2158,2159,2180],finish:[12,28,13,7,3,8,5,30,7,35,8,36,9,30,18,3,32,32,4,14,12,12,7,12,4,null,37,4,9,7,6,39,21]},
+  {car:'97',first:'Shane Van',last:'Gisbergen',color:'#FB923C',pts:[13,45,90,116,117,140,174,177,178,195,215,283,316,348,355,361,362,425,437,469,516,537,544,567,586,605,616,630,647,660,688,718,729],finish:[30,6,2,11,36,14,11,34,36,20,17,1,11,5,30,31,38,1,14,16,5,5,15,16,16,null,26,23,20,24,9,7,26]},
+  {car:'6',first:'Brad',last:'Keselowski',color:'#6366F1',pts:[39,61,78,100,127,182,206,229,264,279,311,318,343,347,350,351,354,376,392,403,437,468,478,489,520,543,557,591,615,641,654,662,683],finish:[5,17,20,15,10,2,13,14,6,31,13,30,15,34,34,38,34,34,34,18,7,7,19,19,18,null,23,12,15,12,24,29,16]},
+  {car:'2',first:'Austin',last:'Cindric',color:'#78716C',pts:[13,34,39,52,71,109,149,172,197,226,248,287,288,306,332,355,370,401,434,470,495,518,526,574,599,631,2033,2060,2090,2142,2190,2222,2240],finish:[34,26,32,34,19,5,8,16,12,8,15,9,38,26,11,14,22,22,22,9,14,14,13,15,15,null,13,10,11,2,9,17,19]},
+  {car:'22',first:'Joey',last:'Logano',color:'#0EA5E9',pts:[46,68,90,113,135,139,185,218,225,234,235,245,274,297,329,334,357,370,395,438,511,545,586,659,682,709,2063,2117,2190,2215,2247,2275,2326],finish:[3,18,15,31,15,33,3,7,30,39,37,38,8,14,7,34,18,18,18,17,1,13,16,3,10,null,9,3,1,20,10,9,6]},
+  {car:'43',first:'Erik',last:'Jones',color:'#10B981',pts:[16,29,32,59,76,103,119,133,147,161,196,214,244,270,314,355,372,389,411,446,462,474,476,486,490,498,520,544,549,570,582,595,607],finish:[21,24,34,10,20,10,21,23,23,23,12,19,13,11,2,6,20,20,20,6,21,21,20,20,20,null,15,13,32,16,25,24,25]},
+  {car:'60',first:'Ryan',last:'Preece',color:'#EF4444',pts:[17,49,68,92,125,154,180,209,235,269,298,296,303,304,313,322,367,402,407,420,447,480,497,517,555,622,2031,2055,2082,2109,2118,2140,2159],finish:[25,9,18,13,11,13,12,8,11,18,14,14,33,36,28,28,11,11,11,28,10,10,17,17,12,null,10,17,10,10,28,15,18]},
+  {car:'71',first:'Michael',last:'McDowell',color:'#D946EF',pts:[26,43,83,111,122,139,158,171,174,179,189,225,248,275,286,306,333,369,377,399,412,442,454,463,484,517,537,554,570,580,597,615,616],finish:[22,20,5,9,26,20,18,24,34,32,27,2,14,15,26,17,10,10,10,27,24,24,21,21,21,null,17,20,21,27,21,19,36]},
+  {car:'16',first:'AJ',last:'Allmendinger',color:'#64748B',pts:[18,43,86,104,117,124,134,156,162,183,199,235,254,266,286,301,346,375,395,396,397,409,438,442,456,463,478,499,514,529,551,560,574],finish:[19,12,9,19,24,30,27,15,31,16,25,7,18,35,17,22,5,5,5,21,37,37,22,22,22,null,22,16,22,22,15,28,23]},
+  {car:'38',first:'Zane',last:'Smith',color:'#B45309',pts:[41,71,75,85,108,123,126,144,149,183,198,217,244,272,282,283,316,340,349,356,371,393,417,418,442,455,467,468,477,483,484,501,523],finish:[6,7,33,27,14,22,34,19,32,5,22,18,10,9,33,37,4,4,23,24,22,22,24,24,24,null,25,36,28,31,36,20,15]},
+  {car:'47',first:'Ricky Stenhouse',last:'Jr.',color:'#DC2626',pts:[39,40,49,64,72,80,87,107,123,161,187,193,222,263,271,299,303,319,347,347,347,347,347,347,347,347,432,443,450,455,460,474,481],finish:[2,36,28,22,29,29,30,17,21,6,19,31,12,4,29,15,33,33,15,null,34,null,null,null,null,null,35,26,30,32,32,23,30]},
+  {car:'1',first:'Ross',last:'Chastain',color:'#7C3AED',pts:[17,51,64,74,94,115,136,153,164,205,216,236,238,239,260,294,327,356,375,401,412,436,479,504,505,518,528,560,592,614,621,642,673],finish:[20,3,35,28,17,16,16,20,26,7,26,27,35,37,16,8,7,7,7,19,27,27,18,18,19,null,27,5,12,15,30,16,9]},
+  {car:'34',first:'Todd',last:'Gilliland',color:'#0891B2',pts:[16,16,39,65,68,82,96,127,147,181,186,206,223,240,255,283,306,306,353,384,406,421,428,444,468,468,489,502,520,538,542,557,582],finish:[39,25,21,12,34,23,23,6,17,11,32,17,20,20,22,19,21,21,21,25,8,8,null,23,23,null,16,24,19,19,33,22,14]},
+  {car:'35',first:'Riley',last:'Herbst',color:'#16A34A',pts:[35,39,53,72,86,88,90,109,132,144,173,186,202,224,250,271,309,309,348,369,369,369,369,369,369,369,409,412,415,427,446,465,470],finish:[8,33,23,18,23,35,35,21,14,25,11,26,21,17,13,16,8,8,8,null,18,18,null,null,null,null,30,34,34,25,18,18,32]},
+  {car:'3',first:'Austin',last:'Dillon',color:'#9333EA',pts:[17,17,35,56,81,93,105,124,145,163,182,220,225,244,245,257,270,270,341,341,341,341,341,341,341,341,443,474,494,510,528,539,540],finish:[37,29,19,16,12,25,25,18,16,19,18,6,32,18,36,25,24,24,24,null,23,23,23,null,null,null,29,6,17,21,19,26,37]},
+  {car:'42',first:'John Hunter',last:'Nemechek',color:'#C2410C',pts:[25,43,63,75,91,101,109,111,126,141,157,189,201,213,236,277,298,298,350,350,350,350,350,350,350,350,431,453,465,489,497,499,503],finish:[26,19,17,25,21,27,29,35,22,22,21,10,26,24,14,4,16,16,16,null,31,31,null,null,null,null,24,15,25,13,29,35,33]},
 ];
 
 // Race numbers where qualifying was rained out (owner pts grid)
@@ -984,7 +984,7 @@ function expandDriver(id) {
     <div style="font-family:var(--font-d);font-weight:900;font-size:18px;color:${d.color};letter-spacing:1px;margin-bottom:4px;">#${d.car} · ${d.first} ${d.last}</div>
     <div style="font-size:10px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">JGR Toyota Camry XSE</div>
     ${statRow('Points', pts||'—', d.color, `P${rank||'—'} · ${nRaced(d)} starts`)}
-    ${showCutline?statRow('vs Cutline', pts?(diff>0?'+':'')+diff:'—', diff>=0?'#2ecc71':'var(--red)', `Cutline: ${cut} pts`):''}
+    ${showCutline?statRow('vs Cutline', pts?(diff>0?'+':'')+diff:'—', diff>=0?'#2ecc71':'var(--red)', `Cutline: ${cut} pts`):statRow('vs Leader', pts?(pts===DATA.leaderPts?'Leader':pts-DATA.leaderPts):'—', pts===DATA.leaderPts?'var(--gold)':'var(--red)', `${DATA.leaderName}: ${DATA.leaderPts} pts`)}
     ${statRow('Avg Pts / Race', avgP(d), 'var(--gold)')}
     ${statRow('Avg Start · Finish', `${avgS(d)} · ${avgF(d)}`)}
     ${statRow('Wins · Poles', `${d.wins||0} · ${poles(d)}`, d.wins?'var(--gold)':'')}
@@ -1115,14 +1115,23 @@ function closeExpand() {
 function buildChaseList() {
   const standings=DATA.standings||[];
   const p16pts=standings[15]?.pts||0;
+  const ldrPts=standings[0]?.pts||0;
+  const showCut=DATA.racesDone<=29;
   let html='';
   standings.forEach((s,i)=>{
-    if(i===16 && DATA.racesDone<=29) html+=`<div class="chase-cutline-sep">── Chase Cutline ──</div>`;
+    if(i===16 && showCut) html+=`<div class="chase-cutline-sep">── Chase Cutline ──</div>`;
     const d=s.jgr?DRIVERS.find(dr=>dr.id===s.dId):null;
     const color=d?d.color:'var(--text3)';
-    const diff=s.pts-p16pts;
-    const dTxt=i<16?(i===15?'cut':`+${diff}`):diff+'';
-    const dClr=i<16?'var(--text3)':(i===15?'var(--gold)':'var(--red)');
+    let dTxt, dClr;
+    if(showCut){
+      const diff=s.pts-p16pts;
+      dTxt=i<16?(i===15?'cut':`+${diff}`):diff+'';
+      dClr=i<16?'var(--text3)':(i===15?'var(--gold)':'var(--red)');
+    } else {
+      const diff=s.pts-ldrPts;
+      dTxt=i===0?'ldr':`${diff}`;
+      dClr=i===0?'var(--gold)':'var(--text3)';
+    }
     html+=`<li class="chase-item">
       <span class="ci-pos">${s.pos}</span>
       <span class="ci-name"><span class="ci-dot" style="background:${color};"></span>${(()=>{const p=s.name.split(' ');return p[p.length-1]==='Jr.'?p.slice(-2).join(' '):p.slice(-1)[0];})()}${s.jgr?` <span style="color:${color};font-size:9px;font-family:var(--font-d);font-weight:700;">JGR</span>`:''}</span>
@@ -1146,7 +1155,7 @@ function buildMetricsTable() {
       <td><div class="mt-d"><div class="mt-sw" style="background:${d.color};"></div>#${d.car} ${d.last}</div></td>
       <td>${pts||'—'}</td>
       <td class="${isC?'mv-r':''}">${rank?`P${rank}`:'—'}</td>
-      <td class="${showCutline?(diff>=0?'mv-gr':'mv-r'):''}">${pts?(diff>0?'+':'')+diff:'—'}</td>
+      <td class="${showCutline?(diff>=0?'mv-gr':'mv-r'):''}">${showCutline&&pts?(diff>0?'+':'')+diff:'—'}</td>
       <td class="mv-r">${pts?pts-ldr:'—'}</td>
       <td>${avgP(d)}</td><td>${avgPnoDNF(d)}</td><td>${avgS(d)}</td><td>${avgF(d)}</td>
       <td class="mv-g">${poles(d)||0}</td>
@@ -1199,7 +1208,7 @@ function buildMetricsPage() {
       {k:'Avg RP — Stage 2',   v:avgARP_S2(d),          c:''},
       {k:'Avg RP — Stage 3',   v:avgARP_S3(d),          c:''},
       {k:'DNFs',               v:dnf(d),                c:dnf(d)>0?'red':''},
-      {k:'vs Cutline',         v:pts?(diff>0?'+':'')+diff:'—',c:showCutline?(diff>=0?'green':'red'):''},
+      ...(showCutline?[{k:'vs Cutline', v:pts?(diff>0?'+':'')+diff:'—',c:diff>=0?'green':'red'}]:[]),
       {k:'vs Series Leader',   v:pts?pts-ldr:'—',       c:'red'},
       {k:'Projected at R26',   v:p26,                   c:showCutline?(typeof p26==='number'&&p26>=cut?'green':'red'):''},
       {k:'Projected at R36',   v:p36,                   c:''},
@@ -1754,6 +1763,8 @@ function buildCompare() {
   const finArr = d=>(d.finish||[]).slice(0,rd).filter(v=>v!==null);
   const avgFin = d=>{const a=finArr(d);return a.length?(a.reduce((s,v)=>s+v,0)/a.length).toFixed(1):'—';};
 
+  const cmpHdr=document.getElementById('cmp-delta-hdr');
+  if(cmpHdr) cmpHdr.textContent = DATA.racesDone<=29 ? 'vs Cutline' : 'vs Leader';
   document.getElementById('cmp-table-body').innerHTML = allDrivers.map(d=>{
     const ptsRaw=(d.pts||[])[rd-1]??'—';
     const isPlayoffEra = DATA.racesDone > 26;
@@ -1764,8 +1775,8 @@ function buildCompare() {
     const standingsEntry = (DATA.standings||[]).find(s=>s.car===d.car);
     const rank = standingsEntry ? standingsEntry.pos : (d.isJgr ? lRank(d) : null);
     const showCutlineCmp=DATA.racesDone<=29;
-    const diff=typeof ptsRaw==='number'?ptsRaw-cut:null;
-    const diffTxt=diff!==null?(showCutlineCmp?(diff>=0?`<span style="color:var(--green);">+${diff}</span>`:`<span style="color:var(--red);">${diff}</span>`):(diff>=0?`+${diff}`:`${diff}`)):'—';
+    const diff=typeof ptsRaw==='number'?ptsRaw-(showCutlineCmp?cut:DATA.leaderPts):null;
+    const diffTxt=diff!==null?(showCutlineCmp?(diff>=0?`<span style="color:var(--green);">+${diff}</span>`:`<span style="color:var(--red);">${diff}</span>`):(diff===0?'Leader':`${diff}`)):'—';
     return `<tr style="${d.isJgr?`background:${d.color}08;`:''}">
       <td><span style="color:${d.color};font-family:var(--font-d);font-weight:700;">#${d.car}</span> ${d.first||''} ${d.last}</td>
       <td>${rank?'P'+rank:'—'}</td>
